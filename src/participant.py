@@ -3,6 +3,14 @@ from datetime import datetime
 
 class Participant:
     def __init__(self, identifier: str = '', phone: str = ''):
+        """
+        A single participant to the study, that will receive messages
+
+        :param identifier: The participant identifier, in the format RS%3d (RS followed by three digits)
+        :type identifier: str
+        :param phone: Phone number
+        :type phone: str
+        """
         self.participant_id = identifier
         self.phone_number = phone
         self._wake_time = None

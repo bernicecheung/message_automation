@@ -52,11 +52,14 @@ def random_times(start: datetime, end: datetime, n: int) -> List[datetime]:
 
 
 class EventGenerator:
-    """
-    Generate events for making text messages
-    """
-
     def __init__(self, config: Dict[str, str], participant: Participant):
+        """
+        Generate events for making text messages.
+
+        :param config: A dictionary of configuration values
+        :param participant: The participant who will receive messages
+        :type participant: Participant
+        """
         self._config = config
         self._participant = participant
 
