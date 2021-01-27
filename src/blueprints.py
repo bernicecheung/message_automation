@@ -40,8 +40,8 @@ def generation_form():
             rc = Redcap(api_token=current_app.config['AUTOMATIONCONFIG']['redcap_api_token'])
             try:
                 part = rc.get_participant_specific_data(request.form['participant'])
-            except RedcapError as e:
-                flash(str(e), 'danger')
+            except RedcapError as err:
+                flash(str(err), 'danger')
                 return render_template('generation_form.html')
 
             eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part)
