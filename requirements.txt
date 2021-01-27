@@ -1,0 +1,4 @@
+requests
+jsonpickle
+flask
+Werkzeug
