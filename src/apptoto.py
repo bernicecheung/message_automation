@@ -30,7 +30,7 @@ class Apptoto:
         """
         url = f'{self._endpoint}/events'
         request_data = jsonpickle.encode({'events': events, 'prevent_calendar_creation': True}, unpicklable=False)
-        logging.getLogger().info(f'Posting events to apptoto')
+        logging.getLogger().info('Posting events to apptoto')
         r = requests.post(url=url,
                           data=request_data,
                           headers=self._headers,

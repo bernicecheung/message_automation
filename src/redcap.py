@@ -7,15 +7,22 @@ from src.participant import Participant
 
 class RedcapError(Exception):
     def __init__(self, message):
+        """
+        An exception for interactions with REDCap.
+
+        :param message: A string describing the error
+        """
         self.message = message
 
 
 class Redcap:
-    """
-    Interact with the REDCap API to collect participant information.
-    """
-
     def __init__(self, api_token: str, endpoint: str = 'https://redcap.uoregon.edu/api/'):
+        """
+        Interact with the REDCap API to collect participant information.
+
+        :param api_token: API token for the REDCap project
+        :param endpoint: REDCap endpoint URI
+        """
         self._endpoint = endpoint
         self._headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self._timeout = 5
