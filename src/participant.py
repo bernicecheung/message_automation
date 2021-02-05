@@ -15,6 +15,8 @@ class Participant:
         self.phone_number = phone
         self._wake_time = None
         self._sleep_time = None
+        self.condition = None
+        self.values = []
 
     @property
     def wake_time(self):

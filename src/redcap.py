@@ -2,6 +2,7 @@ from typing import Dict
 
 import requests
 
+from src.message import Condition
 from src.participant import Participant
 
 
@@ -42,6 +43,9 @@ class Redcap:
             if id_ == participant_id:
                 part.participant_id = id_
                 part.phone_number = s0['phone']
+                part.values.append = s0['value1_s0']
+                part.values.append = s0['value2_s0']
+                part.values.append = s0['value3_s0']
 
         session1 = self._get_session1()
         for s1 in session1:
@@ -49,6 +53,7 @@ class Redcap:
             if id_ == participant_id:
                 part.wake_time = s1['waketime']
                 part.sleep_time = s1['sleeptime']
+                part.condition = Condition(int(s1['condition']))
 
         if len(session0) == 0 or len(session1) == 0:
             raise RedcapError(f'Unable to find participant in Redcap - participant ID - {participant_id}')
@@ -68,8 +73,11 @@ class Redcap:
                         'format': 'json',
                         'fields[0]': 'rs_id',
                         'fields[1]': 'phone',
+                        'fields[2]': 'value1_s0',
+                        'fields[3]': 'value2_s0',
+                        'fields[4]': 'value3_s0',
                         'events[0]': 'session_0_arm_1'}
-        return self._make_request(request_data, 'phone number')
+        return self._make_request(request_data, 'Session 0 data')
 
     def _get_session1(self):
         request_data = {'content': 'record',
@@ -77,5 +85,6 @@ class Redcap:
                         'fields[0]': 'rs_id',
                         'fields[1]': 'waketime',
                         'fields[2]': 'sleeptime',
+                        'fields[3]': 'condition',
                         'events[0]': 'session_1_arm_1'}
-        return self._make_request(request_data, 'wake time and sleep time')
+        return self._make_request(request_data, 'Session 1 data')
