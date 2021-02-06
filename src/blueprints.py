@@ -44,7 +44,10 @@ def generation_form():
                 flash(str(err), 'danger')
                 return render_template('generation_form.html')
 
-            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part)
+            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'],
+                                participant=part,
+                                start_date=request.form['start_date'],
+                                instance_path=current_app.instance_path)
             eg.generate()
 
             flash('Successfully generated messages', 'success')
