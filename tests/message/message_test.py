@@ -1,7 +1,9 @@
-from src.message import MessageLibrary, Condition, CodedValues
-from src.event_generator import MESSAGES_PER_DAY_1, MESSAGES_PER_DAY_2
-from hypothesis import given, strategies as st
 from pathlib import Path
+
+from hypothesis import given, strategies as st
+
+from src.event_generator import MESSAGES_PER_DAY_1, MESSAGES_PER_DAY_2
+from src.message import MessageLibrary, Condition, CodedValues
 
 
 # Test that every combination of Condition and CodedValues has enough messages

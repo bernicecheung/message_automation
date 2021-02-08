@@ -8,8 +8,8 @@ from typing import Dict, List
 from src.apptoto import Apptoto
 from src.apptoto_event import ApptotoEvent
 from src.apptoto_participant import ApptotoParticipant
-from src.participant import Participant
 from src.message import MessageLibrary
+from src.participant import Participant
 
 MESSAGES_PER_DAY_1 = 5
 MESSAGES_PER_DAY_2 = 4
