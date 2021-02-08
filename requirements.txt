@@ -2,3 +2,4 @@ requests
 jsonpickle
 flask
 Werkzeug
+-r tests/requirements.txt
