@@ -12,6 +12,9 @@ from src.participant import Participant
 from src.message import MessageLibrary
 
 
+MESSAGES_PER_DAY_1 = 5
+MESSAGES_PER_DAY_2 = 4
+
 def intervals_valid(deltas: List[int]) -> bool:
     """
     Determine if intervals are valid
@@ -86,7 +89,7 @@ class EventGenerator:
             end = e + delta
             # Get times each day to send messages
             # Send 5 messages a day for the first 28 days
-            times_list = random_times(start, end, 5)
+            times_list = random_times(start, end, MESSAGES_PER_DAY_1)
             for t in times_list:
                 try:
                     events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title=f'RS SMS',
@@ -104,7 +107,7 @@ class EventGenerator:
             end = e + delta
             # Get times each day to send messages
             # Send 4 messages a day for the first 28 days
-            times_list = random_times(start, end, 4)
+            times_list = random_times(start, end, MESSAGES_PER_DAY_2)
             for t in times_list:
                 try:
                     events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title=f'RS SMS',
