@@ -50,7 +50,7 @@ class MessageLibrary:
                     v = CodedValues.none
 
                 m = IndividualMessage(random_id=identifier,
-                                      message=row['message'],
+                                      message=row['Message'],
                                       condition=condition,
                                       coded_values=v)
                 self._messages.append(m)
