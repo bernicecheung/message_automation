@@ -23,6 +23,14 @@ class CodedValues(Enum):
 
 class IndividualMessage:
     def __init__(self, random_id: int, message: str, condition: Condition, coded_values: CodedValues):
+        """
+        An individual message and its metadata.
+
+        :param random_id: Random identifier of message
+        :param message: The message text itself
+        :param condition: The condition the message corresponds to
+        :param coded_values: The values expressed in the message
+        """
         self._id = random_id
         self.message = message
         self._condition = condition
@@ -39,6 +47,11 @@ class IndividualMessage:
 
 class MessageLibrary:
     def __init__(self, path: str):
+        """
+        Read messages and associated metadata.
+
+        :param path: File containing messages
+        """
         self._messages = []
         with open(path) as f:
             reader = csv.DictReader(f)

@@ -95,7 +95,7 @@ class EventGenerator:
             times_list = random_times(start, end, MESSAGES_PER_DAY_1)
             for t in times_list:
                 try:
-                    events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title=f'RS SMS',
+                    events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title='RS SMS',
                                                start_time=t, end_time=t,
                                                content=condition_messages[n].message,
                                                participants=[copy.copy(part)]))
@@ -113,7 +113,7 @@ class EventGenerator:
             times_list = random_times(start, end, MESSAGES_PER_DAY_2)
             for t in times_list:
                 try:
-                    events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title=f'RS SMS',
+                    events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title='RS SMS',
                                                start_time=t, end_time=t,
                                                content=condition_messages[n].message,
                                                participants=[copy.copy(part)]))

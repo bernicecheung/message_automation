@@ -1,6 +1,3 @@
-from datetime import datetime, time
-
-
 class Participant:
     def __init__(self, identifier: str = '', phone: str = ''):
         """
@@ -17,4 +14,3 @@ class Participant:
         self.sleep_time = None
         self.condition = None
         self.values = []
-
