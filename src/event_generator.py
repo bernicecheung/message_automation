@@ -11,9 +11,9 @@ from src.apptoto_participant import ApptotoParticipant
 from src.participant import Participant
 from src.message import MessageLibrary
 
-
 MESSAGES_PER_DAY_1 = 5
 MESSAGES_PER_DAY_2 = 4
+
 
 def intervals_valid(deltas: List[int]) -> bool:
     """
