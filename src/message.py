@@ -1,5 +1,6 @@
 import csv
 from enum import Enum
+from random import shuffle
 from typing import List
 
 
@@ -55,8 +56,16 @@ class MessageLibrary:
                                       coded_values=v)
                 self._messages.append(m)
 
-    def get_messages_by_condition(self, condition: Condition, values: List[CodedValues]) -> List[IndividualMessage]:
+    def get_messages_by_condition(self, condition: Condition, values: List[CodedValues], num_messages)\
+            -> List[IndividualMessage]:
+        messages = []
         if condition is Condition.VALUES:
-            return [m for m in self._messages if m.condition is Condition.VALUES and m.coded_value in values]
+            messages = [m for m in self._messages if m.condition is Condition.VALUES and m.coded_value in values]
         else:
-            return [m for m in self._messages if m.condition is condition]
+            messages = [m for m in self._messages if m.condition is condition]
+
+        shuffle(messages)
+        while len(messages) < num_messages:
+            messages = messages + messages
+
+        return messages

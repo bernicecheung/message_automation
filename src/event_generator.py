@@ -77,7 +77,10 @@ class EventGenerator:
 
         events = []
         messages = MessageLibrary(path=self._path)
-        condition_messages = messages.get_messages_by_condition(self._participant.condition, self._participant.values)
+        num_required_messages = 28 * (MESSAGES_PER_DAY_1 + MESSAGES_PER_DAY_2)
+        condition_messages = messages.get_messages_by_condition(self._participant.condition,
+                                                                self._participant.values,
+                                                                num_required_messages)
 
         s = datetime.strptime(f'{self._start_date_str} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
         e = datetime.strptime(f'{self._start_date_str} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
