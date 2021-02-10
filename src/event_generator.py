@@ -68,7 +68,7 @@ class EventGenerator:
         self._config = config
         self._participant = participant
         self._start_date_str = start_date
-        self._path = Path(instance_path) / 'messages.csv'
+        self._path = Path(instance_path) / config['message_file']
 
     def generate(self):
         apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
