@@ -48,7 +48,8 @@ def generation_form():
                                 participant=part,
                                 start_date=request.form['start_date'],
                                 instance_path=current_app.instance_path)
-            eg.generate()
-
-            flash('Successfully generated messages', 'success')
+            if eg.generate():
+                flash('Successfully generated messages', 'success')
+            else:
+                flash('Failed to create some messages', 'danger')
             return render_template('generation_form.html')
