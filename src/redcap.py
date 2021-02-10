@@ -2,7 +2,7 @@ from typing import Dict
 
 import requests
 
-from src.message import Condition
+from src.enums import Condition, CodedValues
 from src.participant import Participant
 
 
@@ -43,9 +43,10 @@ class Redcap:
             if id_ == participant_id:
                 part.participant_id = id_
                 part.phone_number = s0['phone']
-                part.values.append = s0['value1_s0']
-                part.values.append = s0['value2_s0']
-                part.values.append = s0['value3_s0']
+                part.values.append(CodedValues(int(s0['value1_s0'])))
+                part.values.append(CodedValues(int(s0['value2_s0'])))
+                part.values.append(CodedValues(int(s0['value3_s0'])))
+                break
 
         session1 = self._get_session1()
         for s1 in session1:
@@ -54,6 +55,7 @@ class Redcap:
                 part.wake_time = s1['waketime']
                 part.sleep_time = s1['sleeptime']
                 part.condition = Condition(int(s1['condition']))
+                break
 
         if len(session0) == 0 or len(session1) == 0:
             raise RedcapError(f'Unable to find participant in Redcap - participant ID - {participant_id}')
