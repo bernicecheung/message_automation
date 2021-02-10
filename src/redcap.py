@@ -57,7 +57,7 @@ class Redcap:
                 part.condition = Condition(int(s1['condition']))
                 break
 
-        if len(session0) == 0 or len(session1) == 0:
+        if part.participant_id != participant_id:
             raise RedcapError(f'Unable to find participant in Redcap - participant ID - {participant_id}')
 
         return part
