@@ -20,7 +20,7 @@ class Apptoto:
         self._api_token = api_token
         self._user = user
         self._headers = {'Content-Type': 'application/json'}
-        self._timeout = 5
+        self._timeout = 10
 
     def post_events(self, events: List[ApptotoEvent]):
         """
@@ -29,17 +29,22 @@ class Apptoto:
         :param events: List of events to create
         """
         url = f'{self._endpoint}/events'
-        request_data = jsonpickle.encode({'events': events, 'prevent_calendar_creation': True}, unpicklable=False)
-        logging.getLogger().info('Posting events to apptoto')
-        r = requests.post(url=url,
-                          data=request_data,
-                          headers=self._headers,
-                          timeout=self._timeout,
-                          auth=HTTPBasicAuth(username=self._user, password=self._api_token))
+        # Post 5 events at a time because Apptoto's API can't handle all events at once.
+        for i in range(0, len(events), 5):
+            events_slice = events[i:i + 5]
+            request_data = jsonpickle.encode({'events': events_slice, 'prevent_calendar_creation': True}, unpicklable=False)
+            print('Posting events to apptoto')
+            r = requests.post(url=url,
+                              data=request_data,
+                              headers=self._headers,
+                              timeout=self._timeout,
+                              auth=HTTPBasicAuth(username=self._user, password=self._api_token))
 
-        if r.status_code == requests.codes.ok:
-            logging.getLogger().info('Posted events to apptoto')
-        else:
-            logging.getLogger().info(f'Failed to post events - {str(r.status_code)} - {str(r.content)}')
+            if r.status_code == requests.codes.ok:
+                print('Posted events to apptoto')
+            else:
+                print(f'Failed to post events {i} through {i+5}, starting at {events[i].start_time}')
+                print(f'Failed to post events - {str(r.status_code)} - {str(r.content)}')
+                return r.status_code == requests.codes.ok
 
-        return r.status_code == requests.codes.ok
+        return True
