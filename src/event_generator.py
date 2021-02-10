@@ -70,7 +70,7 @@ class EventGenerator:
         self._start_date_str = start_date
         self._path = Path(instance_path) / config['message_file']
 
-    def generate(self):
+    def generate(self) -> bool:
         apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
                           user=self._config['apptoto_user'])
         part = ApptotoParticipant(name=self._participant.participant_id, phone=self._participant.phone_number)
@@ -122,4 +122,4 @@ class EventGenerator:
                     logging.getLogger().warning(f'Unable to create message from template because of '
                                                 f'invalid placeholder: {str(ke)}')
         if len(events) > 0:
-            apptoto.post_events(events)
+            return apptoto.post_events(events)
