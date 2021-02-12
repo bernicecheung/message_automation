@@ -9,6 +9,7 @@ class Participant:
         :type phone: str
         """
         self.participant_id = identifier
+        self.initials = ''
         self.phone_number = phone
         self.wake_time = None
         self.sleep_time = None

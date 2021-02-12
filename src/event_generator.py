@@ -75,7 +75,7 @@ class EventGenerator:
     def generate(self) -> bool:
         apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
                           user=self._config['apptoto_user'])
-        part = ApptotoParticipant(name=self._participant.participant_id, phone=self._participant.phone_number)
+        part = ApptotoParticipant(name=self._participant.initials, phone=self._participant.phone_number)
 
         events = []
         messages = MessageLibrary(path=self._path)
