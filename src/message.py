@@ -21,6 +21,10 @@ class IndividualMessage:
         self._coded_values = coded_values
 
     @property
+    def message_id(self):
+        return self._id
+
+    @property
     def condition(self):
         return self._condition
 
