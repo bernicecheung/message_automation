@@ -1,4 +1,5 @@
 import copy
+import csv
 import logging
 import random
 from datetime import datetime, timedelta
@@ -69,6 +70,7 @@ class EventGenerator:
         self._participant = participant
         self._start_date_str = start_date
         self._path = Path(instance_path) / config['message_file']
+        self._messages = None
 
     def generate(self) -> bool:
         apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
@@ -78,9 +80,9 @@ class EventGenerator:
         events = []
         messages = MessageLibrary(path=self._path)
         num_required_messages = 28 * (MESSAGES_PER_DAY_1 + MESSAGES_PER_DAY_2)
-        condition_messages = messages.get_messages_by_condition(self._participant.condition,
-                                                                self._participant.values,
-                                                                num_required_messages)
+        self._messages = messages.get_messages_by_condition(self._participant.condition,
+                                                            self._participant.values,
+                                                            num_required_messages)
 
         s = datetime.strptime(f'{self._start_date_str} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
         e = datetime.strptime(f'{self._start_date_str} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
@@ -97,7 +99,7 @@ class EventGenerator:
                 try:
                     events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title='RS SMS',
                                                start_time=t, end_time=t,
-                                               content=condition_messages[n].message,
+                                               content=self._messages[n].message,
                                                participants=[copy.copy(part)]))
                     n = n + 1
                 except KeyError as ke:
@@ -115,7 +117,7 @@ class EventGenerator:
                 try:
                     events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title='RS SMS',
                                                start_time=t, end_time=t,
-                                               content=condition_messages[n].message,
+                                               content=self._messages[n].message,
                                                participants=[copy.copy(part)]))
                     n = n + 1
                 except KeyError as ke:
@@ -123,3 +125,18 @@ class EventGenerator:
                                                 f'invalid placeholder: {str(ke)}')
         if len(events) > 0:
             return apptoto.post_events(events)
+
+    def write_file(self):
+        f = Path.home() / (self._participant.participant_id + '.csv')
+        with open(f, 'w', newline='') as csvfile:
+            fieldnames = ['UO_ID', 'Message']
+            spamwriter = csv.DictWriter(csvfile,
+                                        delimiter=',',
+                                        quotechar='\"',
+                                        quoting=csv.QUOTE_MINIMAL,
+                                        fieldnames=fieldnames)
+            spamwriter.writeheader()
+            for m in self._messages:
+                spamwriter.writerow({'UO_ID': m.message_id, 'Message': m.message})
+
+        return f

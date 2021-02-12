@@ -1,7 +1,7 @@
 from typing import Optional, List
 
 from flask import (
-    Blueprint, current_app, flash, render_template, request
+    Blueprint, current_app, flash, render_template, request, send_file
 )
 from werkzeug.datastructures import ImmutableMultiDict
 
@@ -49,7 +49,8 @@ def generation_form():
                                 start_date=request.form['start_date'],
                                 instance_path=current_app.instance_path)
             if eg.generate():
-                flash('Successfully generated messages', 'success')
+                f = eg.write_file()
+                return send_file(f, mimetype='text/csv', as_attachment=True)
             else:
                 flash('Failed to create some messages', 'danger')
             return render_template('generation_form.html')
