@@ -14,6 +14,7 @@ from src.participant import Participant
 
 MESSAGES_PER_DAY_1 = 5
 MESSAGES_PER_DAY_2 = 4
+DAYS = 28
 
 
 def intervals_valid(deltas: List[int]) -> bool:
@@ -88,7 +89,7 @@ class EventGenerator:
         e = datetime.strptime(f'{self._start_date_str} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
 
         n = 0
-        for days in range(28):
+        for days in range(DAYS):
             delta = timedelta(days=days)
             start = s + delta
             end = e + delta
@@ -106,7 +107,7 @@ class EventGenerator:
                     logging.getLogger().warning(f'Unable to create message from template because of '
                                                 f'invalid placeholder: {str(ke)}')
 
-        for days in range(28):
+        for days in range(DAYS, DAYS + DAYS):
             delta = timedelta(days=days)
             start = s + delta
             end = e + delta
