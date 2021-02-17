@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, List
 
 from flask import (
@@ -5,6 +6,7 @@ from flask import (
 )
 from werkzeug.datastructures import ImmutableMultiDict
 
+from src.apptoto import Apptoto
 from src.event_generator import EventGenerator
 from src.redcap import Redcap, RedcapError
 
@@ -54,3 +56,30 @@ def generation_form():
             else:
                 flash('Failed to create some messages', 'danger')
             return render_template('generation_form.html')
+
+
+@bp.route('/delete', methods=['GET', 'POST'])
+def delete_events():
+    if request.method == 'GET':
+        return render_template('delete_form.html')
+    elif request.method == 'POST':
+        if 'submit' in request.form:
+            # Access form properties, get participant information, get events, and delete
+            participant_id = request.form['participant']
+            rc = Redcap(api_token=current_app.config['AUTOMATIONCONFIG']['redcap_api_token'])
+
+            phone_number = rc.get_participant_phone(participant_id)
+            if not phone_number:
+                flash('Unable to get participant from Redcap', 'danger')
+                return render_template('delete_form.html')
+
+            apptoto = Apptoto(api_token=current_app.config['AUTOMATIONCONFIG']['apptoto_api_token'],
+                              user=current_app.config['AUTOMATIONCONFIG']['apptoto_user'])
+
+            begin = datetime.now()
+            event_ids = apptoto.get_events(begin=begin, phone_number=phone_number)
+            for event_id in event_ids:
+                apptoto.delete_event(event_id)
+
+            flash('Deleted messages', 'success')
+            return render_template('delete_form.html')

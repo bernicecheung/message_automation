@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 from typing import List
 
 import jsonpickle
@@ -20,7 +21,7 @@ class Apptoto:
         self._api_token = api_token
         self._user = user
         self._headers = {'Content-Type': 'application/json'}
-        self._timeout = 10
+        self._timeout = 30
 
     def post_events(self, events: List[ApptotoEvent]):
         """
@@ -48,3 +49,36 @@ class Apptoto:
                 return r.status_code == requests.codes.ok
 
         return True
+
+    def get_events(self, begin: datetime, phone_number: str) -> List[int]:
+        url = f'{self._endpoint}/events'
+        params = {'begin': begin.isoformat(),
+                  'phone_number': phone_number,
+                  'page_size': 260}
+        r = requests.get(url=url,
+                         params=params,
+                         headers=self._headers,
+                         timeout=self._timeout,
+                         auth=HTTPBasicAuth(username=self._user, password=self._api_token))
+
+        event_ids = []
+        if r.status_code == requests.codes.ok:
+            events = r.json()['events']
+            for e in events:
+                event_ids.append(e['id'])
+        else:
+            print(f'Failed to get events - {str(r.status_code)} - {str(r.content)}')
+
+        return event_ids
+
+    def delete_event(self, event_id: int):
+        url = f'{self._endpoint}/events'
+        params = {'id': event_id}
+        r = requests.delete(url=url,
+                            params=params,
+                            headers=self._headers,
+                            timeout=self._timeout,
+                            auth=HTTPBasicAuth(username=self._user, password=self._api_token))
+
+        if r.status_code == requests.codes.ok:
+            print(f'Deleted event - {event_id}')
