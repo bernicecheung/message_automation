@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 import requests
 
@@ -63,6 +63,16 @@ class Redcap:
 
         return part
 
+    def get_participant_phone(self, participant_id: str) -> Optional[str]:
+        phone_number = None
+        session0 = self._get_phone()
+        for s0 in session0:
+            id_ = s0['rs_id']
+            if id_ == participant_id:
+                phone_number = s0['phone']
+
+        return phone_number
+
     def _make_request(self, request_data: Dict[str, str], fields_for_error: str):
         request_data.update(self._data)
         r = requests.post(url=self._endpoint, data=request_data, headers=self._headers, timeout=self._timeout)
@@ -92,3 +102,11 @@ class Redcap:
                         'fields[3]': 'condition',
                         'events[0]': 'session_1_arm_1'}
         return self._make_request(request_data, 'Session 1 data')
+
+    def _get_phone(self):
+        request_data = {'content': 'record',
+                        'format': 'json',
+                        'fields[0]': 'rs_id',
+                        'fields[1]': 'phone',
+                        'events[0]': 'session_0_arm_1'}
+        return self._make_request(request_data, 'Phone number')
