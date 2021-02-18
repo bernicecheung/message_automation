@@ -26,7 +26,7 @@ class Redcap:
         """
         self._endpoint = endpoint
         self._headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-        self._timeout = 5
+        self._timeout = 15
         self._data = {'token': api_token}
 
     def get_participant_specific_data(self, participant_id: str) -> Participant:
