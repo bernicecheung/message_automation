@@ -97,10 +97,12 @@ class EventGenerator:
             # Send 5 messages a day for the first 28 days
             times_list = random_times(start, end, MESSAGES_PER_DAY_1)
             for t in times_list:
+                # Prepend each message with "UO: "
+                content = "UO: " + self._messages[n].message
                 try:
                     events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title='RS SMS',
                                                start_time=t, end_time=t,
-                                               content=self._messages[n].message,
+                                               content=content,
                                                participants=[copy.copy(part)]))
                     n = n + 1
                 except KeyError as ke:
@@ -115,10 +117,12 @@ class EventGenerator:
             # Send 4 messages a day for the first 28 days
             times_list = random_times(start, end, MESSAGES_PER_DAY_2)
             for t in times_list:
+                # Prepend each message with "UO: "
+                content = "UO: " + self._messages[n].message
                 try:
                     events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title='RS SMS',
                                                start_time=t, end_time=t,
-                                               content=self._messages[n].message,
+                                               content=content,
                                                participants=[copy.copy(part)]))
                     n = n + 1
                 except KeyError as ke:
