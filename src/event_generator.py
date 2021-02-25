@@ -100,15 +100,13 @@ class EventGenerator:
             for t in times_list:
                 # Prepend each message with "UO: "
                 content = "UO: " + self._messages[n].message
-                try:
-                    events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title='RS SMS',
-                                               start_time=t, end_time=t,
-                                               content=content,
-                                               participants=[copy.copy(part)]))
-                    n = n + 1
-                except KeyError as ke:
-                    logging.getLogger().warning(f'Unable to create message from template because of '
-                                                f'invalid placeholder: {str(ke)}')
+                events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                           title='RS SMS',
+                                           start_time=t,
+                                           end_time=t,
+                                           content=content,
+                                           participants=[copy.copy(part)]))
+                n = n + 1
 
         for days in range(DAYS, DAYS + DAYS):
             delta = timedelta(days=days)
@@ -120,15 +118,13 @@ class EventGenerator:
             for t in times_list:
                 # Prepend each message with "UO: "
                 content = "UO: " + self._messages[n].message
-                try:
-                    events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'], title='RS SMS',
-                                               start_time=t, end_time=t,
-                                               content=content,
-                                               participants=[copy.copy(part)]))
-                    n = n + 1
-                except KeyError as ke:
-                    logging.getLogger().warning(f'Unable to create message from template because of '
-                                                f'invalid placeholder: {str(ke)}')
+                events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                           title='RS SMS',
+                                           start_time=t,
+                                           end_time=t,
+                                           content=content,
+                                           participants=[copy.copy(part)]))
+                n = n + 1
 
         # Add one message per day asking for a reply with the number of cigarettes smoked
         for days in range(DAYS + DAYS):
