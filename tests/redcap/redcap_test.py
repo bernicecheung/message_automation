@@ -60,3 +60,17 @@ class TestRedcap:
 
         assert part.participant_id == 'RS999'
         assert part.values == [CodedValues.humor, CodedValues.relationships, CodedValues.creativity]
+
+    def test_get_participant_specific_data_missing_session(self, requests_mock):
+        # Test when session 1 is missing
+        rc = Redcap(api_token='test token')
+        requests_mock.post(rc._endpoint,
+                           [
+                               {'json': [session0_data], 'status_code': requests.codes.ok},
+                               {'json': [], 'status_code': requests.codes.ok}
+                           ])
+
+        with pytest.raises(RedcapError) as e:
+            rc.get_participant_specific_data('RS999')
+
+        assert 'session 1' in str(e.value)
