@@ -87,6 +87,7 @@ class EventGenerator:
 
         s = datetime.strptime(f'{self._start_date_str} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
         e = datetime.strptime(f'{self._start_date_str} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
+        hour_before_sleep_time = e - timedelta(seconds=3600)
 
         n = 0
         for days in range(DAYS):
@@ -128,6 +129,19 @@ class EventGenerator:
                 except KeyError as ke:
                     logging.getLogger().warning(f'Unable to create message from template because of '
                                                 f'invalid placeholder: {str(ke)}')
+
+        # Add one message per day asking for a reply with the number of cigarettes smoked
+        for days in range(DAYS + DAYS):
+            delta = timedelta(days=days)
+            t = hour_before_sleep_time + delta
+            content = "UO: Reply back with the number of cigarettes smoked today"
+            events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                       title='RS SMS',
+                                       start_time=t,
+                                       end_time=t,
+                                       content=content,
+                                       participants=[copy.copy(part)]))
+
         if len(events) > 0:
             return apptoto.post_events(events)
 
