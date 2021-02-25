@@ -49,27 +49,34 @@ class Redcap:
                 part.values.append(CodedValues(int(s0['value3_s0'])))
                 break
 
-        session1 = self._get_session1()
-        for s1 in session1:
-            id_ = s1['rs_id']
-            if id_ == participant_id:
-                part.wake_time = s1['waketime']
-                part.sleep_time = s1['sleeptime']
-                part.condition = Condition(int(s1['condition']))
-                break
-
         if part.participant_id != participant_id:
-            raise RedcapError(f'Unable to find participant in Redcap - participant ID - {participant_id}')
+            raise RedcapError(f'Unable to find session 0 in Redcap - participant ID - {participant_id}')
+
+        session1 = self._get_session1()
+        if len(session1) > 0:
+            for s1 in session1:
+                id_ = s1['rs_id']
+                if id_ == participant_id:
+                    part.wake_time = s1['waketime']
+                    part.sleep_time = s1['sleeptime']
+                    part.condition = Condition(int(s1['condition']))
+                    break
+
+        if not part.wake_time:
+            raise RedcapError(f'Unable to find session 1 in Redcap - participant ID - {participant_id}')
 
         return part
 
-    def get_participant_phone(self, participant_id: str) -> Optional[str]:
+    def get_participant_phone(self, participant_id: str) -> str:
         phone_number = None
         session0 = self._get_phone()
         for s0 in session0:
             id_ = s0['rs_id']
             if id_ == participant_id:
                 phone_number = s0['phone']
+
+        if not phone_number:
+            raise RedcapError(f'Unable to find phone number in Redcap - participant ID - {participant_id}')
 
         return phone_number
 
