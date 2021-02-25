@@ -22,9 +22,10 @@ class TestRedcap:
                            status_code=requests.codes.ok,
                            json=[{'rs_id': 'RS999', 'phone': '555-555-1234'}])
 
-        post = rc.get_participant_phone('Invalid ID')
+        with pytest.raises(RedcapError) as e:
+            rc.get_participant_phone('Invalid ID')
 
-        assert not post
+        assert 'phone number' in str(e.value)
 
     def test_get_participant_phone_valid(self, requests_mock):
         rc = Redcap(api_token='test token')

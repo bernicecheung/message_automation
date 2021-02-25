@@ -68,9 +68,10 @@ def delete_events():
             participant_id = request.form['participant']
             rc = Redcap(api_token=current_app.config['AUTOMATIONCONFIG']['redcap_api_token'])
 
-            phone_number = rc.get_participant_phone(participant_id)
-            if not phone_number:
-                flash('Unable to get participant from Redcap', 'danger')
+            try:
+                phone_number = rc.get_participant_phone(participant_id)
+            except RedcapError as err:
+                flash(str(err), 'danger')
                 return render_template('delete_form.html')
 
             apptoto = Apptoto(api_token=current_app.config['AUTOMATIONCONFIG']['apptoto_api_token'],

@@ -67,13 +67,16 @@ class Redcap:
 
         return part
 
-    def get_participant_phone(self, participant_id: str) -> Optional[str]:
+    def get_participant_phone(self, participant_id: str) -> str:
         phone_number = None
         session0 = self._get_phone()
         for s0 in session0:
             id_ = s0['rs_id']
             if id_ == participant_id:
                 phone_number = s0['phone']
+
+        if not phone_number:
+            raise RedcapError(f'Unable to find phone number in Redcap - participant ID - {participant_id}')
 
         return phone_number
 
