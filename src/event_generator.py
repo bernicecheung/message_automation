@@ -145,13 +145,13 @@ class EventGenerator:
         f = Path.home() / (self._participant.participant_id + '.csv')
         with open(f, 'w', newline='') as csvfile:
             fieldnames = ['UO_ID', 'Message']
-            spamwriter = csv.DictWriter(csvfile,
+            filewriter = csv.DictWriter(csvfile,
                                         delimiter=',',
                                         quotechar='\"',
                                         quoting=csv.QUOTE_MINIMAL,
                                         fieldnames=fieldnames)
-            spamwriter.writeheader()
+            filewriter.writeheader()
             for m in self._messages:
-                spamwriter.writerow({'UO_ID': m.message_id, 'Message': m.message})
+                filewriter.writerow({'UO_ID': m.message_id, 'Message': m.message})
 
         return f
