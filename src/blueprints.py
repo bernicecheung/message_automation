@@ -15,8 +15,8 @@ bp = Blueprint('blueprints', __name__)
 
 def _validate_participant_id(form_data: ImmutableMultiDict) -> Optional[List[str]]:
     errors = []
-    if len(form_data['participant']) != 5 or not form_data['participant'].startswith('RS'):
-        errors.append('Participant identifier must be in form \"RSnnn\"')
+    if len(form_data['participant']) != 6 or not form_data['participant'].startswith('ASH'):
+        errors.append('Participant identifier must be in form \"ASHnnn\"')
 
     if errors:
         return errors

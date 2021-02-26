@@ -16,6 +16,7 @@ from src.participant import Participant
 MESSAGES_PER_DAY_1 = 5
 MESSAGES_PER_DAY_2 = 4
 DAYS = 28
+SMS_TITLE = 'ASH SMS'
 TASK_MESSAGES = 64
 ITI = [
     1.8,
@@ -167,7 +168,7 @@ class EventGenerator:
                 # Prepend each message with "UO: "
                 content = "UO: " + self._messages[n].message
                 events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
-                                           title='RS SMS',
+                                           title=SMS_TITLE,
                                            start_time=t,
                                            end_time=t,
                                            content=content,
@@ -185,7 +186,7 @@ class EventGenerator:
                 # Prepend each message with "UO: "
                 content = "UO: " + self._messages[n].message
                 events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
-                                           title='RS SMS',
+                                           title=SMS_TITLE,
                                            start_time=t,
                                            end_time=t,
                                            content=content,
@@ -198,7 +199,7 @@ class EventGenerator:
             t = hour_before_sleep_time + delta
             content = "UO: Reply back with the number of cigarettes smoked today"
             events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
-                                       title='RS SMS',
+                                       title=SMS_TITLE,
                                        start_time=t,
                                        end_time=t,
                                        content=content,
