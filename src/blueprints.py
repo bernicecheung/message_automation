@@ -94,3 +94,30 @@ def delete_events():
 
             flash('Deleted messages', 'success')
             return render_template('delete_form.html')
+
+
+@bp.route('/task', methods=['GET', 'POST'])
+def task():
+    if request.method == 'GET':
+        return render_template('task_form.html')
+    elif request.method == 'POST':
+        if 'value-task' in request.form:
+            error = _validate_participant_id(request.form)
+            error = None
+            if error:
+                for e in error:
+                    flash(e, 'danger')
+                return render_template('task_form.html')
+
+            rc = Redcap(api_token=current_app.config['AUTOMATIONCONFIG']['redcap_api_token'])
+            try:
+                part = rc.get_participant_specific_data(request.form['participant'])
+            except RedcapError as err:
+                flash(str(err), 'danger')
+                return render_template('task_form.html')
+
+            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part,
+                                instance_path=current_app.instance_path)
+
+            f = eg.task_input_file()
+            return send_file(f, mimetype='text/csv', as_attachment=True)

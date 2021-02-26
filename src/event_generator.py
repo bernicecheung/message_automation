@@ -9,12 +9,80 @@ from typing import Dict, List
 from src.apptoto import Apptoto
 from src.apptoto_event import ApptotoEvent
 from src.apptoto_participant import ApptotoParticipant
+from src.enums import Condition
 from src.message import MessageLibrary
 from src.participant import Participant
 
 MESSAGES_PER_DAY_1 = 5
 MESSAGES_PER_DAY_2 = 4
 DAYS = 28
+TASK_MESSAGES = 64
+ITI = [
+    1.8,
+    4.5,
+    2.3,
+    1.0,
+    4.3,
+    4.3,
+    2.7,
+    1.6,
+    4.0,
+    1.4,
+    3.6,
+    1.0,
+    2.3,
+    5.5,
+    1.8,
+    3.2,
+    3.9,
+    2.4,
+    5.0,
+    3.0,
+    5.2,
+    1.0,
+    1.6,
+    3.9,
+    3.0,
+    3.1,
+    4.4,
+    3.1,
+    4.5,
+    1.5,
+    1.8,
+    1.2,
+    1.0,
+    1.6,
+    1.0,
+    4.7,
+    1.1,
+    4.5,
+    3.1,
+    1.1,
+    2.1,
+    2.4,
+    2.7,
+    4.1,
+    5.9,
+    1.4,
+    3.2,
+    4.6,
+    3.4,
+    1.0,
+    3.0,
+    5.3,
+    4.4,
+    1.4,
+    4.1,
+    2.3,
+    5.1,
+    1.5,
+    2.1,
+    4.3,
+    2.5,
+    6.0,
+    1.8,
+    5.4
+]
 
 
 def intervals_valid(deltas: List[int]) -> bool:
@@ -151,5 +219,26 @@ class EventGenerator:
             filewriter.writeheader()
             for m in self._messages:
                 filewriter.writerow({'UO_ID': m.message_id, 'Message': m.message})
+
+        return f
+
+    def task_input_file(self):
+        f = Path.home() / (self._participant.participant_id + '_conditions.csv')
+
+        messages = MessageLibrary(path=self._path)
+        num_required_messages = TASK_MESSAGES
+        task_messages = messages.get_messages_by_condition(Condition.VALUES,
+                                                           self._participant.values,
+                                                           num_required_messages)
+        with open(f, 'w', newline='') as csvfile:
+            fieldnames = ['message', 'iti']
+            filewriter = csv.DictWriter(csvfile,
+                                        delimiter=',',
+                                        quotechar='\"',
+                                        quoting=csv.QUOTE_MINIMAL,
+                                        fieldnames=fieldnames)
+            filewriter.writeheader()
+            for i, m in enumerate(task_messages):
+                filewriter.writerow({fieldnames[0]: m.message, fieldnames[1]: ITI[i]})
 
         return f
