@@ -3,7 +3,7 @@ class Participant:
         """
         A single participant to the study, that will receive messages
 
-        :param identifier: The participant identifier, in the format RS%3d (RS followed by three digits)
+        :param identifier: The participant identifier, in the format ASH%3d (ASH followed by three digits)
         :type identifier: str
         :param phone: Phone number
         :type phone: str
