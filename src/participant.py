@@ -14,4 +14,5 @@ class Participant:
         self.wake_time = None
         self.sleep_time = None
         self.condition = None
-        self.values = []
+        self.message_values = []
+        self.task_values = []

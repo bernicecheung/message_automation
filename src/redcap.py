@@ -44,9 +44,11 @@ class Redcap:
                 part.participant_id = participant_id
                 part.initials = s0['initials']
                 part.phone_number = s0['phone']
-                part.values.append(CodedValues(int(s0['value1_s0'])))
-                part.values.append(CodedValues(int(s0['value2_s0'])))
-                part.values.append(CodedValues(int(s0['value3_s0'])))
+                part.message_values.append(CodedValues(int(s0['value1_s0'])))
+                part.message_values.append(CodedValues(int(s0['value2_s0'])))
+
+                part.task_values.append(CodedValues(int(s0['value1_s0'])))
+                part.task_values.append(CodedValues(int(s0['value7_s0'])))
                 break
 
         if part.participant_id != participant_id:
@@ -95,7 +97,7 @@ class Redcap:
                         'fields[1]': 'phone',
                         'fields[2]': 'value1_s0',
                         'fields[3]': 'value2_s0',
-                        'fields[4]': 'value3_s0',
+                        'fields[4]': 'value7_s0',
                         'fields[5]': 'initials',
                         'events[0]': 'session_0_arm_1'}
         return self._make_request(request_data, 'Session 0 data')

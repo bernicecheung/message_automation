@@ -13,10 +13,22 @@ from src.redcap import Redcap, RedcapError
 bp = Blueprint('blueprints', __name__)
 
 
-def _validate_form(form_data: ImmutableMultiDict) -> Optional[List[str]]:
+def _validate_participant_id(form_data: ImmutableMultiDict) -> Optional[List[str]]:
     errors = []
     if len(form_data['participant']) != 5 or not form_data['participant'].startswith('RS'):
         errors.append('Participant identifier must be in form \"RSnnn\"')
+
+    if errors:
+        return errors
+    else:
+        return None
+
+
+def _validate_form(form_data: ImmutableMultiDict) -> Optional[List[str]]:
+    errors = []
+
+    if (temp := _validate_participant_id(form_data)) is not None:
+        errors += temp
     if len(form_data['start_date']) == 0:
         errors.append('Start date cannot be empty')
 
@@ -46,11 +58,9 @@ def generation_form():
                 flash(str(err), 'danger')
                 return render_template('generation_form.html')
 
-            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'],
-                                participant=part,
-                                start_date=request.form['start_date'],
+            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part,
                                 instance_path=current_app.instance_path)
-            if eg.generate():
+            if eg.generate(request.form['start_date']):
                 f = eg.write_file()
                 return send_file(f, mimetype='text/csv', as_attachment=True)
             else:
@@ -84,3 +94,29 @@ def delete_events():
 
             flash('Deleted messages', 'success')
             return render_template('delete_form.html')
+
+
+@bp.route('/task', methods=['GET', 'POST'])
+def task():
+    if request.method == 'GET':
+        return render_template('task_form.html')
+    elif request.method == 'POST':
+        if 'value-task' in request.form:
+            error = _validate_participant_id(request.form)
+            if error:
+                for e in error:
+                    flash(e, 'danger')
+                return render_template('task_form.html')
+
+            rc = Redcap(api_token=current_app.config['AUTOMATIONCONFIG']['redcap_api_token'])
+            try:
+                part = rc.get_participant_specific_data(request.form['participant'])
+            except RedcapError as err:
+                flash(str(err), 'danger')
+                return render_template('task_form.html')
+
+            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part,
+                                instance_path=current_app.instance_path)
+
+            f = eg.task_input_file()
+            return send_file(f, mimetype='text/csv', as_attachment=True)
