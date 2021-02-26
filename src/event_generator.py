@@ -58,22 +58,20 @@ def random_times(start: datetime, end: datetime, n: int) -> List[datetime]:
 
 
 class EventGenerator:
-    def __init__(self, config: Dict[str, str], participant: Participant, start_date: str, instance_path: str):
+    def __init__(self, config: Dict[str, str], participant: Participant, instance_path: str):
         """
         Generate events for making text messages.
 
-        :param start_date:
         :param config: A dictionary of configuration values
         :param participant: The participant who will receive messages
         :type participant: Participant
         """
         self._config = config
         self._participant = participant
-        self._start_date_str = start_date
         self._path = Path(instance_path) / config['message_file']
         self._messages = None
 
-    def generate(self) -> bool:
+    def generate(self, start_date: str) -> bool:
         apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
                           user=self._config['apptoto_user'])
         part = ApptotoParticipant(name=self._participant.initials, phone=self._participant.phone_number)
@@ -85,8 +83,8 @@ class EventGenerator:
                                                             self._participant.values,
                                                             num_required_messages)
 
-        s = datetime.strptime(f'{self._start_date_str} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
-        e = datetime.strptime(f'{self._start_date_str} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
+        s = datetime.strptime(f'{start_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
+        e = datetime.strptime(f'{start_date} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
         hour_before_sleep_time = e - timedelta(seconds=3600)
 
         n = 0

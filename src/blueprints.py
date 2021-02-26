@@ -58,11 +58,9 @@ def generation_form():
                 flash(str(err), 'danger')
                 return render_template('generation_form.html')
 
-            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'],
-                                participant=part,
-                                start_date=request.form['start_date'],
+            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part,
                                 instance_path=current_app.instance_path)
-            if eg.generate():
+            if eg.generate(request.form['start_date']):
                 f = eg.write_file()
                 return send_file(f, mimetype='text/csv', as_attachment=True)
             else:
