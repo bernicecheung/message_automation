@@ -13,10 +13,22 @@ from src.redcap import Redcap, RedcapError
 bp = Blueprint('blueprints', __name__)
 
 
-def _validate_form(form_data: ImmutableMultiDict) -> Optional[List[str]]:
+def _validate_participant_id(form_data: ImmutableMultiDict) -> Optional[List[str]]:
     errors = []
     if len(form_data['participant']) != 5 or not form_data['participant'].startswith('RS'):
         errors.append('Participant identifier must be in form \"RSnnn\"')
+
+    if errors:
+        return errors
+    else:
+        return None
+
+
+def _validate_form(form_data: ImmutableMultiDict) -> Optional[List[str]]:
+    errors = []
+
+    if (temp := _validate_participant_id(form_data)) is not None:
+        errors += temp
     if len(form_data['start_date']) == 0:
         errors.append('Start date cannot be empty')
 
