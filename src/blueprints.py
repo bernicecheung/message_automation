@@ -103,7 +103,6 @@ def task():
     elif request.method == 'POST':
         if 'value-task' in request.form:
             error = _validate_participant_id(request.form)
-            error = None
             if error:
                 for e in error:
                     flash(e, 'danger')
