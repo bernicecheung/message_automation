@@ -228,7 +228,7 @@ class EventGenerator:
         messages = MessageLibrary(path=self._path)
         num_required_messages = TASK_MESSAGES
         task_messages = messages.get_messages_by_condition(Condition.VALUES,
-                                                           self._participant.message_values,
+                                                           self._participant.task_values,
                                                            num_required_messages)
         with open(f, 'w', newline='') as csvfile:
             fieldnames = ['message', 'iti']
