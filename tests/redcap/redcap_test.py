@@ -7,7 +7,7 @@ session0_data = {'rs_id': 'RS999',
                  'phone': '555-555-1234',
                  'value1_s0': '1',
                  'value2_s0': '2',
-                 'value3_s0': '3',
+                 'value7_s0': '7',
                  'initials': 'ABC'}
 session1_data = {'rs_id': 'RS999',
                  'waketime': '07:00',
@@ -60,7 +60,8 @@ class TestRedcap:
         part = rc.get_participant_specific_data('RS999')
 
         assert part.participant_id == 'RS999'
-        assert part.values == [CodedValues.humor, CodedValues.relationships, CodedValues.creativity]
+        assert part.message_values == [CodedValues.humor, CodedValues.relationships]
+        assert part.task_values == [CodedValues.humor, CodedValues.athletic]
 
     def test_get_participant_specific_data_missing_session(self, requests_mock):
         # Test when session 1 is missing

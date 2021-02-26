@@ -148,7 +148,7 @@ class EventGenerator:
         messages = MessageLibrary(path=self._path)
         num_required_messages = 28 * (MESSAGES_PER_DAY_1 + MESSAGES_PER_DAY_2)
         self._messages = messages.get_messages_by_condition(self._participant.condition,
-                                                            self._participant.values,
+                                                            self._participant.message_values,
                                                             num_required_messages)
 
         s = datetime.strptime(f'{start_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
@@ -228,7 +228,7 @@ class EventGenerator:
         messages = MessageLibrary(path=self._path)
         num_required_messages = TASK_MESSAGES
         task_messages = messages.get_messages_by_condition(Condition.VALUES,
-                                                           self._participant.values,
+                                                           self._participant.message_values,
                                                            num_required_messages)
         with open(f, 'w', newline='') as csvfile:
             fieldnames = ['message', 'iti']
