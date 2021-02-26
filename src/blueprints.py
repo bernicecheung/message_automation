@@ -27,7 +27,8 @@ def _validate_participant_id(form_data: ImmutableMultiDict) -> Optional[List[str
 def _validate_form(form_data: ImmutableMultiDict) -> Optional[List[str]]:
     errors = []
 
-    if (temp := _validate_participant_id(form_data)) is not None:
+    temp = _validate_participant_id(form_data)
+    if temp is not None:
         errors += temp
     if len(form_data['start_date']) == 0:
         errors.append('Start date cannot be empty')
