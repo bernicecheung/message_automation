@@ -69,4 +69,4 @@ class MessageLibrary:
         while len(messages) < num_messages:
             messages = messages + messages
 
-        return messages
+        return messages[:num_messages]
