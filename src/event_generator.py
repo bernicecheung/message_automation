@@ -2,6 +2,7 @@ import copy
 import csv
 import logging
 import random
+import zipfile
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List
@@ -17,72 +18,28 @@ MESSAGES_PER_DAY_1 = 5
 MESSAGES_PER_DAY_2 = 4
 DAYS = 28
 SMS_TITLE = 'ASH SMS'
-TASK_MESSAGES = 64
+TASK_MESSAGES = 20
 ITI = [
-    1.8,
-    4.5,
-    2.3,
-    1.0,
-    4.3,
-    4.3,
-    2.7,
-    1.6,
-    4.0,
-    1.4,
-    3.6,
-    1.0,
-    2.3,
-    5.5,
-    1.8,
-    3.2,
-    3.9,
-    2.4,
-    5.0,
-    3.0,
-    5.2,
-    1.0,
-    1.6,
-    3.9,
-    3.0,
-    3.1,
-    4.4,
-    3.1,
-    4.5,
-    1.5,
-    1.8,
+    0.0,
     1.2,
-    1.0,
-    1.6,
-    1.0,
-    4.7,
-    1.1,
-    4.5,
-    3.1,
-    1.1,
-    2.1,
-    2.4,
-    2.7,
-    4.1,
-    5.9,
-    1.4,
-    3.2,
-    4.6,
-    3.4,
-    1.0,
-    3.0,
-    5.3,
-    4.4,
-    1.4,
-    4.1,
-    2.3,
-    5.1,
-    1.5,
-    2.1,
-    4.3,
-    2.5,
-    6.0,
+    1.9,
     1.8,
-    5.4
+    2.2,
+    1.2,
+    2.8,
+    1.1,
+    2.1,
+    2.0,
+    1.7,
+    1.1,
+    1.3,
+    5.3,
+    1.0,
+    1.2,
+    1.5,
+    3.4,
+    2.1,
+    1.0
 ]
 
 
@@ -124,6 +81,19 @@ def random_times(start: datetime, end: datetime, n: int) -> List[datetime]:
 
     times = [start + timedelta(seconds=x) for x in r]
     return times
+
+
+def _create_archive(participant_id: str) -> str:
+    compression = zipfile.ZIP_STORED
+
+    archive_name = Path.home().joinpath(f'{participant_id}_conditions.zip')
+    with zipfile.ZipFile(archive_name, mode='w', compression=compression) as zf:
+        p = Path.home()
+
+        for f in p.glob(f'*{participant_id}*.csv'):
+            zf.write(f, arcname=f.name, compress_type=compression)
+
+    return str(archive_name)
 
 
 class EventGenerator:
@@ -224,22 +194,26 @@ class EventGenerator:
         return f
 
     def task_input_file(self):
-        f = Path.home() / (self._participant.participant_id + '_conditions.csv')
-
         messages = MessageLibrary(path=self._path)
-        num_required_messages = TASK_MESSAGES
-        task_messages = messages.get_messages_by_condition(Condition.VALUES,
-                                                           self._participant.task_values,
-                                                           num_required_messages)
-        with open(f, 'w', newline='') as csvfile:
-            fieldnames = ['message', 'iti']
-            filewriter = csv.DictWriter(csvfile,
-                                        delimiter=',',
-                                        quotechar='\"',
-                                        quoting=csv.QUOTE_MINIMAL,
-                                        fieldnames=fieldnames)
-            filewriter.writeheader()
-            for i, m in enumerate(task_messages):
-                filewriter.writerow({fieldnames[0]: m.message, fieldnames[1]: ITI[i]})
 
-        return f
+        for session in range(1, 3):
+            for run in range(1, 5):
+                file_name = Path.home() / f'VAFF_{self._participant.participant_id}_Session{session}_Run{run}.csv'
+
+                with open(file_name, 'w', newline='') as csvfile:
+                    fieldnames = ['message', 'iti']
+                    filewriter = csv.DictWriter(csvfile,
+                                                delimiter=',',
+                                                quotechar='\"',
+                                                quoting=csv.QUOTE_MINIMAL,
+                                                fieldnames=fieldnames)
+                    filewriter.writeheader()
+
+                    task_messages = messages.get_messages_by_condition(Condition.VALUES,
+                                                                       self._participant.task_values,
+                                                                       TASK_MESSAGES)
+
+                    for i, m in enumerate(task_messages):
+                        filewriter.writerow({fieldnames[0]: m.message, fieldnames[1]: ITI[i]})
+
+        return _create_archive(self._participant.participant_id)
