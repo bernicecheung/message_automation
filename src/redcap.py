@@ -39,7 +39,7 @@ class Redcap:
 
         session0 = self._get_session0()
         for s0 in session0:
-            id_ = s0['rs_id']
+            id_ = s0['ash_id']
             if id_ == participant_id:
                 part.participant_id = participant_id
                 part.initials = s0['initials']
@@ -57,7 +57,7 @@ class Redcap:
         session1 = self._get_session1()
         if len(session1) > 0:
             for s1 in session1:
-                id_ = s1['rs_id']
+                id_ = s1['ash_id']
                 if id_ == participant_id:
                     part.wake_time = s1['waketime']
                     part.sleep_time = s1['sleeptime']
@@ -73,7 +73,7 @@ class Redcap:
         phone_number = None
         session0 = self._get_phone()
         for s0 in session0:
-            id_ = s0['rs_id']
+            id_ = s0['ash_id']
             if id_ == participant_id:
                 phone_number = s0['phone']
 
@@ -93,7 +93,7 @@ class Redcap:
     def _get_session0(self):
         request_data = {'content': 'record',
                         'format': 'json',
-                        'fields[0]': 'rs_id',
+                        'fields[0]': 'ash_id',
                         'fields[1]': 'phone',
                         'fields[2]': 'value1_s0',
                         'fields[3]': 'value2_s0',
@@ -105,7 +105,7 @@ class Redcap:
     def _get_session1(self):
         request_data = {'content': 'record',
                         'format': 'json',
-                        'fields[0]': 'rs_id',
+                        'fields[0]': 'ash_id',
                         'fields[1]': 'waketime',
                         'fields[2]': 'sleeptime',
                         'fields[3]': 'condition',
@@ -115,7 +115,7 @@ class Redcap:
     def _get_phone(self):
         request_data = {'content': 'record',
                         'format': 'json',
-                        'fields[0]': 'rs_id',
+                        'fields[0]': 'ash_id',
                         'fields[1]': 'phone',
                         'events[0]': 'session_0_arm_1'}
         return self._make_request(request_data, 'Phone number')
