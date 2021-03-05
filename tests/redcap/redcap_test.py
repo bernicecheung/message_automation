@@ -3,13 +3,13 @@ from src.enums import CodedValues
 import requests
 import pytest
 
-session0_data = {'rs_id': 'RS999',
+session0_data = {'ash_id': 'ASH999',
                  'phone': '555-555-1234',
                  'value1_s0': '1',
                  'value2_s0': '2',
                  'value7_s0': '7',
                  'initials': 'ABC'}
-session1_data = {'rs_id': 'RS999',
+session1_data = {'ash_id': 'ASH999',
                  'waketime': '07:00',
                  'sleeptime': '21:00',
                  'condition': '3'}
@@ -20,7 +20,7 @@ class TestRedcap:
         rc = Redcap(api_token='test token')
         requests_mock.post(url=rc._endpoint,
                            status_code=requests.codes.ok,
-                           json=[{'rs_id': 'RS999', 'phone': '555-555-1234'}])
+                           json=[{'ash_id': 'ASH999', 'phone': '555-555-1234'}])
 
         with pytest.raises(RedcapError) as e:
             rc.get_participant_phone('Invalid ID')
@@ -31,9 +31,9 @@ class TestRedcap:
         rc = Redcap(api_token='test token')
         requests_mock.post(url=rc._endpoint,
                            status_code=requests.codes.ok,
-                           json=[{'rs_id': 'RS999', 'phone': '555-555-1234'}])
+                           json=[{'ash_id': 'ASH999', 'phone': '555-555-1234'}])
 
-        post = rc.get_participant_phone('RS999')
+        post = rc.get_participant_phone('ASH999')
 
         assert post
         assert post == '555-555-1234'
@@ -57,9 +57,9 @@ class TestRedcap:
                            status_code=requests.codes.ok,
                            json=[session0_data])
 
-        part = rc.get_participant_specific_data('RS999')
+        part = rc.get_participant_specific_data('ASH999')
 
-        assert part.participant_id == 'RS999'
+        assert part.participant_id == 'ASH999'
         assert part.message_values == [CodedValues.humor, CodedValues.relationships]
         assert part.task_values == [CodedValues.humor, CodedValues.athletic]
 
@@ -73,6 +73,6 @@ class TestRedcap:
                            ])
 
         with pytest.raises(RedcapError) as e:
-            rc.get_participant_specific_data('RS999')
+            rc.get_participant_specific_data('ASH999')
 
         assert 'session 1' in str(e.value)
