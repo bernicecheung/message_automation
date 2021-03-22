@@ -1,5 +1,6 @@
-from typing import Dict, Optional
+from typing import Dict
 
+import jsonschema
 import requests
 
 from src.enums import Condition, CodedValues
@@ -14,6 +15,113 @@ class RedcapError(Exception):
         :param message: A string describing the error
         """
         self.message = message
+
+
+def _get_session0_schema() -> Dict:
+    schema = {
+        "$schema": "Session 0 schema",
+        "definitions": {
+            "session0": {
+                 "type": "object",
+                 "properties": {
+                     "ash_id": {
+                         "description": "Unique subject identifier",
+                         "type": "string",
+                         "minLength": 6,
+                         "maxLength": 6,
+                         "pattern": "^ASH[0-9]{3}$"
+                     },
+                     "phone": {
+                         "description": "Subject phone number",
+                         "type": "string"
+                     },
+                     "value1_s0": {
+                         "description": "Subject's most important value defined in session 0",
+                         "type": "string",
+                         "minLength": 1,
+                         "maxLength": 1,
+                         "pattern": "^[0-9]{1}$"
+                     },
+                     "value2_s0": {
+                         "description": "Subject's second most important value defined in session 0",
+                         "type": "string",
+                         "minLength": 1,
+                         "maxLength": 1,
+                         "pattern": "^[0-9]{1}$"
+                     },
+                     "value7_s0": {
+                         "description": "Subject's least important value defined in session 0",
+                         "type": "string",
+                         "minLength": 1,
+                         "maxLength": 1,
+                         "pattern": "^[0-9]{1}$"
+                     },
+                     "initials": {
+                         "description": "Subject initials",
+                         "type": "string"
+                     },
+                     "redcap_event_name": {
+                         "description": "REDCap event name",
+                         "type": "string"
+                     },
+                 }
+             }
+        },
+        "type": "array",
+        "items": {"$ref": "#/definitions/session0"}
+    }
+    return schema
+
+
+def _get_session1_schema() -> Dict:
+    schema = {
+        "$schema": "Session 1 schema",
+        "definitions": {
+            "session1": {
+                 "type": "object",
+                 "properties": {
+                     "ash_id": {
+                         "description": "Unique subject identifier",
+                         "type": "string",
+                         "minLength": 6,
+                         "maxLength": 6,
+                         "pattern": "^ASH[0-9]{3}$"
+                     },
+                     "waketime": {
+                         "description": "Usual time subject wakes up",
+                         "type": "string",
+                         "pattern": "^[0-9]{2}:[0-9]{2}$"
+                     },
+                     "sleeptime": {
+                         "description": "Usual time subject goes to sleep",
+                         "type": "string",
+                         "pattern": "^[0-9]{2}:[0-9]{2}$"
+                     },
+                     "condition": {
+                         "description": "Experimental condition",
+                         "type": "string",
+                         "minLength": 1,
+                         "maxLength": 1,
+                         "pattern": "^[0-9]{1}$"
+                     },
+                     "redcap_event_name": {
+                         "description": "REDCap event name",
+                         "type": "string"
+                     },
+                 }
+             }
+        },
+        "type": "array",
+        "items": {"$ref": "#/definitions/session1"}
+    }
+    return schema
+
+
+def _validate(json: str, schema: Dict):
+    try:
+        jsonschema.validate(json, schema)
+    except (jsonschema.ValidationError, jsonschema.SchemaError) as e:
+        raise RedcapError('Response from REDCap does not match expected format') from e
 
 
 class Redcap:
@@ -38,6 +146,8 @@ class Redcap:
         part = Participant()
 
         session0 = self._get_session0()
+        _validate(session0, _get_session0_schema())
+
         for s0 in session0:
             id_ = s0['ash_id']
             if id_ == participant_id:
@@ -55,6 +165,8 @@ class Redcap:
             raise RedcapError(f'Unable to find session 0 in Redcap - participant ID - {participant_id}')
 
         session1 = self._get_session1()
+        _validate(session1, _get_session1_schema())
+
         if len(session1) > 0:
             for s1 in session1:
                 id_ = s1['ash_id']
