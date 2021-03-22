@@ -183,7 +183,9 @@ class Redcap:
 
     def get_participant_phone(self, participant_id: str) -> str:
         phone_number = None
-        session0 = self._get_phone()
+        session0 = self._get_session0()
+        _validate(session0, _get_session0_schema())
+
         for s0 in session0:
             id_ = s0['ash_id']
             if id_ == participant_id:
@@ -223,11 +225,3 @@ class Redcap:
                         'fields[3]': 'condition',
                         'events[0]': 'session_1_arm_1'}
         return self._make_request(request_data, 'Session 1 data')
-
-    def _get_phone(self):
-        request_data = {'content': 'record',
-                        'format': 'json',
-                        'fields[0]': 'ash_id',
-                        'fields[1]': 'phone',
-                        'events[0]': 'session_0_arm_1'}
-        return self._make_request(request_data, 'Phone number')
