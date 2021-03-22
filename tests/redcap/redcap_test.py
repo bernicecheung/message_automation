@@ -16,11 +16,11 @@ session1_data = {'ash_id': 'ASH999',
 
 
 class TestRedcap:
-    def test_get_participant_phone_invalid(self, requests_mock):
+    def test_get_participant_phone_invalid_id(self, requests_mock):
         rc = Redcap(api_token='test token')
         requests_mock.post(url=rc._endpoint,
                            status_code=requests.codes.ok,
-                           json=[{'ash_id': 'ASH999', 'phone': '555-555-1234'}])
+                           json=[session0_data])
 
         with pytest.raises(RedcapError) as e:
             rc.get_participant_phone('Invalid ID')
@@ -31,7 +31,7 @@ class TestRedcap:
         rc = Redcap(api_token='test token')
         requests_mock.post(url=rc._endpoint,
                            status_code=requests.codes.ok,
-                           json=[{'ash_id': 'ASH999', 'phone': '555-555-1234'}])
+                           json=[session0_data])
 
         post = rc.get_participant_phone('ASH999')
 
