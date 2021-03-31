@@ -76,3 +76,12 @@ class TestRedcap:
             rc.get_participant_specific_data('ASH999')
 
         assert 'session 1' in str(e.value)
+
+    def test_get_participant_specific_data_does_not_follow_schema(self, requests_mock):
+        rc = Redcap(api_token='test token')
+        requests_mock.post(url=rc._endpoint,
+                           status_code=requests.codes.ok,
+                           json=[{'ash_id': 123}])
+
+        with pytest.raises(RedcapError):
+            rc.get_participant_specific_data('Response from REDCap')
