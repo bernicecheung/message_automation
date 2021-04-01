@@ -10,14 +10,11 @@ from typing import Dict, List
 from src.apptoto import Apptoto
 from src.apptoto_event import ApptotoEvent
 from src.apptoto_participant import ApptotoParticipant
+from src.constants import DAYS_1, DAYS_2, MESSAGES_PER_DAY_1, MESSAGES_PER_DAY_2
 from src.enums import Condition
 from src.message import MessageLibrary
 from src.participant import Participant
 
-MESSAGES_PER_DAY_1 = 5
-MESSAGES_PER_DAY_2 = 4
-DAYS_1 = 28
-DAYS_2 = 28
 SMS_TITLE = 'ASH SMS'
 TASK_MESSAGES = 20
 ITI = [
