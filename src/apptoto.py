@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import List
+from typing import List, Tuple
 
 import jsonpickle
 import requests
@@ -8,6 +8,8 @@ from requests.auth import HTTPBasicAuth
 
 from src.apptoto_event import ApptotoEvent
 from src.constants import DAYS_1, DAYS_2, MESSAGES_PER_DAY_1, MESSAGES_PER_DAY_2
+
+RETHINK_SMOKING_CALENDAR_ID = 1000024493
 
 
 class Apptoto:
@@ -84,3 +86,36 @@ class Apptoto:
 
         if r.status_code == requests.codes.ok:
             print(f'Deleted event - {event_id}')
+
+    def get_conversations(self, phone_number: str) -> List[Tuple[str, str]]:
+        """Get """
+        url = f'{self._endpoint}/events'
+        begin = datetime(year=2021, month=4, day=1).isoformat()
+        params = {'begin': begin,
+                  'phone_number': phone_number,
+                  'include_conversations': True}
+        r = requests.get(url=url,
+                         params=params,
+                         headers=self._headers,
+                         timeout=self._timeout,
+                         auth=HTTPBasicAuth(username=self._user, password=self._api_token))
+
+        conversations = []
+        if r.status_code == requests.codes.ok:
+            response = r.json()['events']
+            for e in response:
+                # Check only events on the right calendar, where there is a conversation
+                if e['calendar_id'] == RETHINK_SMOKING_CALENDAR_ID and \
+                    e['participants'] and \
+                        e['participants'][0]['conversations']:
+                    for conversation in e['participants'][0]['conversations']:
+                        if conversation['messages']:
+                            for m in conversation['messages']:
+                                # for each replied event get the content and the time.
+                                # Content should be the participant's response.
+                                if 'replied' in m['event_type']:
+                                    conversations.append((m['at'], m['content']))
+        else:
+            print(f'Failed to get events - {str(r.status_code)} - {str(r.content)}')
+
+        return conversations

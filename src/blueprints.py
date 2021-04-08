@@ -2,8 +2,9 @@ from datetime import datetime
 from typing import Optional, List
 
 from flask import (
-    Blueprint, current_app, flash, render_template, request, send_file
+    Blueprint, current_app, flash, make_response, render_template, request, send_file
 )
+from flask.json import jsonify
 from werkzeug.datastructures import ImmutableMultiDict
 
 from src.apptoto import Apptoto
@@ -121,3 +122,25 @@ def task():
 
             f = eg.task_input_file()
             return send_file(f, mimetype='text/csv', as_attachment=True)
+
+
+@bp.route('/count/<participant_id>', methods=['GET'])
+def participant_responses(participant_id):
+    part = ImmutableMultiDict({'participant': participant_id})
+    error = _validate_participant_id(part)
+    if error:
+        return make_response((jsonify(error), 400))
+
+    # Use participant ID to get phone number, then get all events and filter conversations for participant responses.
+    rc = Redcap(api_token=current_app.config['AUTOMATIONCONFIG']['redcap_api_token'])
+
+    try:
+        phone_number = rc.get_participant_phone(participant_id)
+    except RedcapError as err:
+        return make_response((jsonify(str(err)), 404))
+
+    apptoto = Apptoto(api_token=current_app.config['AUTOMATIONCONFIG']['apptoto_api_token'],
+                      user=current_app.config['AUTOMATIONCONFIG']['apptoto_user'])
+
+    conversations = apptoto.get_conversations(phone_number=phone_number)
+    return make_response(jsonify(conversations), 200)
