@@ -88,7 +88,7 @@ class Apptoto:
             print(f'Deleted event - {event_id}')
 
     def get_conversations(self, phone_number: str) -> List[Tuple[str, str]]:
-        """Get """
+        """Get timestamp and content of participant's responses."""
         url = f'{self._endpoint}/events'
         begin = datetime(year=2021, month=4, day=1).isoformat()
         params = {'begin': begin,
