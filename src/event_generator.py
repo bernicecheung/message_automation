@@ -10,13 +10,11 @@ from typing import Dict, List
 from src.apptoto import Apptoto
 from src.apptoto_event import ApptotoEvent
 from src.apptoto_participant import ApptotoParticipant
+from src.constants import DAYS_1, DAYS_2, MESSAGES_PER_DAY_1, MESSAGES_PER_DAY_2
 from src.enums import Condition
 from src.message import MessageLibrary
 from src.participant import Participant
 
-MESSAGES_PER_DAY_1 = 5
-MESSAGES_PER_DAY_2 = 4
-DAYS = 28
 SMS_TITLE = 'ASH SMS'
 TASK_MESSAGES = 20
 ITI = [
@@ -127,7 +125,7 @@ class EventGenerator:
         hour_before_sleep_time = e - timedelta(seconds=3600)
 
         n = 0
-        for days in range(DAYS):
+        for days in range(DAYS_1):
             delta = timedelta(days=days)
             start = s + delta
             end = e + delta
@@ -145,7 +143,7 @@ class EventGenerator:
                                            participants=[copy.copy(part)]))
                 n = n + 1
 
-        for days in range(DAYS, DAYS + DAYS):
+        for days in range(DAYS_1, DAYS_1 + DAYS_2):
             delta = timedelta(days=days)
             start = s + delta
             end = e + delta
@@ -164,7 +162,7 @@ class EventGenerator:
                 n = n + 1
 
         # Add one message per day asking for a reply with the number of cigarettes smoked
-        for days in range(DAYS + DAYS):
+        for days in range(DAYS_1 + DAYS_2):
             delta = timedelta(days=days)
             t = hour_before_sleep_time + delta
             content = "UO: Reply back with the number of cigarettes smoked today"
