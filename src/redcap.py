@@ -60,6 +60,14 @@ def _get_session0_schema() -> Dict:
                          "description": "Subject initials",
                          "type": "string"
                      },
+                     "quitdate": {
+                         "description": "Quit date",
+                         "type": "string"
+                     },
+                     "date_s0": {
+                         "description": "Session 0 date",
+                         "type": "string"
+                     },
                      "redcap_event_name": {
                          "description": "REDCap event name",
                          "type": "string"
@@ -213,6 +221,8 @@ class Redcap:
                         'fields[3]': 'value2_s0',
                         'fields[4]': 'value7_s0',
                         'fields[5]': 'initials',
+                        'fields[6]': 'quitdate',
+                        'fields[7]': 'date_s0',
                         'events[0]': 'session_0_arm_1'}
         return self._make_request(request_data, 'Session 0 data')
 
