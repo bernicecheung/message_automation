@@ -165,7 +165,8 @@ class EventGenerator:
         for days in range(DAYS_1 + DAYS_2):
             delta = timedelta(days=days)
             t = hour_before_sleep_time + delta
-            content = "UO: Reply back with the number of cigarettes smoked today"
+            content = "UO: Good evening! Please respond with the number of cigarettes you have smoked today. " \
+                      "If you have not smoked any cigarettes, please respond with a 0. Thank you!"
             events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
                                        title=SMS_TITLE,
                                        start_time=t,
