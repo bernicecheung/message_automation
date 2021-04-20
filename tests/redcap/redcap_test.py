@@ -10,10 +10,10 @@ session0_data = {'ash_id': 'ASH999',
                  'value7_s0': '7',
                  'initials': 'ABC',
                  'date_s0': '04-19-2021',
-                 'quitdate': '05-19-2021'}
-session1_data = {'ash_id': 'ASH999',
+                 'quitdate': '05-19-2021',
                  'waketime': '07:00',
-                 'sleeptime': '21:00',
+                 'sleeptime': '21:00'}
+session1_data = {'ash_id': 'ASH999',
                  'condition': '3'}
 session0_data_invalid_date = {'ash_id': 'ASH999',
                               'phone': '555-555-1234',
@@ -22,8 +22,9 @@ session0_data_invalid_date = {'ash_id': 'ASH999',
                               'value7_s0': '7',
                               'initials': 'ABC',
                               'date_s0': '21-03-2021',
-                              'quitdate': '21-03-2021'}
-
+                              'quitdate': '21-03-2021',
+                              'waketime': '07:00',
+                              'sleeptime': '21:00'}
 
 class TestRedcap:
     def test_get_participant_phone_invalid_id(self, requests_mock):
