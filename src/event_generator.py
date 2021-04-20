@@ -149,8 +149,8 @@ class EventGenerator:
         # Add quit_message_date date boosters
         s = datetime.strptime(f'{self._participant.quit_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
         quit_message_date = s + timedelta(hours=3)
-        content = f'UO: Quit Date'
-        title = f'UO: Quit Date'
+        content = 'UO: Quit Date'
+        title = 'UO: Quit Date'
         events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
                                    title=title,
                                    start_time=quit_message_date,
@@ -159,8 +159,8 @@ class EventGenerator:
                                    participants=[copy.copy(part)]))
 
         quit_message_date = quit_message_date - timedelta(days=1)
-        content = f'UO: Day Before'
-        title = f'UO: Day Before'
+        content = 'UO: Day Before'
+        title = 'UO: Day Before'
         events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
                                    title=title,
                                    start_time=quit_message_date,
