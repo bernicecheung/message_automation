@@ -11,6 +11,8 @@ class Participant:
         self.participant_id = identifier
         self.initials = ''
         self.phone_number = phone
+        self.session0_date = None
+        self.quit_date = None
         self.wake_time = None
         self.sleep_time = None
         self.condition = None

@@ -1,3 +1,4 @@
+import datetime
 from typing import Dict
 
 import jsonschema
@@ -144,6 +145,41 @@ class Redcap:
         self._headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         self._timeout = 15
         self._data = {'token': api_token}
+
+    def get_session_0(self, participant_id: str) -> Participant:
+        session0 = self._get_session0()
+        _validate(session0, _get_session0_schema())
+
+        id_temp = None
+        initials = None
+        phone_number = None
+        session_0_date = None
+        quit_date = None
+        for s0 in session0:
+            id_ = s0['ash_id']
+            if id_ == participant_id:
+                id_temp = participant_id
+                initials = s0['initials']
+                phone_number = s0['phone']
+                session_0_date_str = s0['date_s0']
+                quit_date_str = s0['quitdate']
+                try:
+                    session_0_date = datetime.datetime.strptime(session_0_date_str, '%m-%d-%Y')
+                    quit_date = datetime.datetime.strptime(quit_date_str, '%m-%d-%Y')
+                except ValueError as e:
+                    raise RedcapError(f'Unable to convert date - {e}')
+                break
+
+        if id_temp != participant_id:
+            raise RedcapError(f'Unable to find session 0 in Redcap - participant ID - {participant_id}')
+
+        part = Participant()
+        part.participant_id = participant_id
+        part.initials = initials
+        part.phone_number = phone_number
+        part.session0_date = session_0_date
+        part.quit_date = quit_date
+        return part
 
     def get_participant_specific_data(self, participant_id: str) -> Participant:
         """
