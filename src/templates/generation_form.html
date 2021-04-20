@@ -13,16 +13,6 @@
     </div>
   </div>
 
-  <!-- Start date -->
-  <div class="columns">
-    <div class="column is-one-fifth">
-      <label for="start_date">Start date to send messages</label>
-    </div>
-    <div class="column is-one-fifth">
-      <input name="start_date" id="start_date" type="date" min="2021-02-01">
-    </div>
-  </div>
-
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 <ul class=flashes>

@@ -25,21 +25,6 @@ def _validate_participant_id(form_data: ImmutableMultiDict) -> Optional[List[str
         return None
 
 
-def _validate_form(form_data: ImmutableMultiDict) -> Optional[List[str]]:
-    errors = []
-
-    temp = _validate_participant_id(form_data)
-    if temp is not None:
-        errors += temp
-    if len(form_data['start_date']) == 0:
-        errors.append('Start date cannot be empty')
-
-    if errors:
-        return errors
-    else:
-        return None
-
-
 @bp.route('/diary', methods=['GET', 'POST'])
 def diary_form():
     if request.method == 'GET':
@@ -74,7 +59,7 @@ def generation_form():
     elif request.method == 'POST':
         if 'submit' in request.form:
             # Access form properties and do stuff
-            error = _validate_form(request.form)
+            error = _validate_participant_id(request.form)
             if error:
                 for e in error:
                     flash(e, 'danger')
@@ -89,7 +74,7 @@ def generation_form():
 
             eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part,
                                 instance_path=current_app.instance_path)
-            if eg.generate(request.form['start_date']):
+            if eg.generate():
                 f = eg.write_file()
                 return send_file(f, mimetype='text/csv', as_attachment=True)
             else:

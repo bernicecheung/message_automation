@@ -172,7 +172,7 @@ class EventGenerator:
         if len(events) > 0:
             return apptoto.post_events(events)
 
-    def generate(self, start_date: str) -> bool:
+    def generate(self) -> bool:
         apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
                           user=self._config['apptoto_user'])
         part = ApptotoParticipant(name=self._participant.initials, phone=self._participant.phone_number)
@@ -184,8 +184,8 @@ class EventGenerator:
                                                             self._participant.message_values,
                                                             num_required_messages)
 
-        s = datetime.strptime(f'{start_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
-        e = datetime.strptime(f'{start_date} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
+        s = datetime.strptime(f'{self._participant.quit_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
+        e = datetime.strptime(f'{self._participant.quit_date} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
         hour_before_sleep_time = e - timedelta(seconds=3600)
 
         n = 0
