@@ -60,6 +60,14 @@ def _get_session0_schema() -> Dict:
                          "description": "Subject initials",
                          "type": "string"
                      },
+                     "quitdate": {
+                         "description": "Quit date",
+                         "type": "string"
+                     },
+                     "date_s0": {
+                         "description": "Session 0 date",
+                         "type": "string"
+                     },
                      "redcap_event_name": {
                          "description": "REDCap event name",
                          "type": "string"
@@ -137,32 +145,57 @@ class Redcap:
         self._timeout = 15
         self._data = {'token': api_token}
 
+    def get_session_0(self, participant_id: str) -> Participant:
+        session0 = self._get_session0()
+        _validate(session0, _get_session0_schema())
+
+        id_temp = None
+        initials = None
+        phone_number = None
+        session_0_date_str = None
+        quit_date_str = None
+        wake_time = None
+        sleep_time = None
+        message_values = []
+        task_values = []
+        for s0 in session0:
+            id_ = s0['ash_id']
+            if id_ == participant_id:
+                id_temp = participant_id
+                initials = s0['initials']
+                phone_number = s0['phone']
+                session_0_date_str = s0['date_s0']
+                quit_date_str = s0['quitdate']
+                wake_time = s0['waketime']
+                sleep_time = s0['sleeptime']
+                message_values.append(CodedValues(int(s0['value1_s0'])))
+                message_values.append(CodedValues(int(s0['value2_s0'])))
+
+                task_values.append(CodedValues(int(s0['value1_s0'])))
+                task_values.append(CodedValues(int(s0['value7_s0'])))
+
+        if id_temp != participant_id:
+            raise RedcapError(f'Unable to find session 0 in Redcap - participant ID - {participant_id}')
+
+        part = Participant()
+        part.participant_id = participant_id
+        part.initials = initials
+        part.phone_number = phone_number
+        part.session0_date = session_0_date_str
+        part.quit_date = quit_date_str
+        part.wake_time = wake_time
+        part.sleep_time = sleep_time
+        part.message_values = message_values
+        part.task_values = task_values
+        return part
+
     def get_participant_specific_data(self, participant_id: str) -> Participant:
         """
         Get participant phone number, usual wake time, and usual sleep time for participant_id.
         :param participant_id: The participant identifier in the form RSnnn
         :return: A Participant
         """
-        part = Participant()
-
-        session0 = self._get_session0()
-        _validate(session0, _get_session0_schema())
-
-        for s0 in session0:
-            id_ = s0['ash_id']
-            if id_ == participant_id:
-                part.participant_id = participant_id
-                part.initials = s0['initials']
-                part.phone_number = s0['phone']
-                part.message_values.append(CodedValues(int(s0['value1_s0'])))
-                part.message_values.append(CodedValues(int(s0['value2_s0'])))
-
-                part.task_values.append(CodedValues(int(s0['value1_s0'])))
-                part.task_values.append(CodedValues(int(s0['value7_s0'])))
-                break
-
-        if part.participant_id != participant_id:
-            raise RedcapError(f'Unable to find session 0 in Redcap - participant ID - {participant_id}')
+        part = self.get_session_0(participant_id)
 
         session1 = self._get_session1()
         _validate(session1, _get_session1_schema())
@@ -171,12 +204,10 @@ class Redcap:
             for s1 in session1:
                 id_ = s1['ash_id']
                 if id_ == participant_id:
-                    part.wake_time = s1['waketime']
-                    part.sleep_time = s1['sleeptime']
                     part.condition = Condition(int(s1['condition']))
                     break
 
-        if not part.wake_time:
+        if not part.condition:
             raise RedcapError(f'Unable to find session 1 in Redcap - participant ID - {participant_id}')
 
         return part
@@ -213,6 +244,10 @@ class Redcap:
                         'fields[3]': 'value2_s0',
                         'fields[4]': 'value7_s0',
                         'fields[5]': 'initials',
+                        'fields[6]': 'quitdate',
+                        'fields[7]': 'date_s0',
+                        'fields[8]': 'waketime',
+                        'fields[9]': 'sleeptime',
                         'events[0]': 'session_0_arm_1'}
         return self._make_request(request_data, 'Session 0 data')
 
@@ -220,8 +255,6 @@ class Redcap:
         request_data = {'content': 'record',
                         'format': 'json',
                         'fields[0]': 'ash_id',
-                        'fields[1]': 'waketime',
-                        'fields[2]': 'sleeptime',
-                        'fields[3]': 'condition',
+                        'fields[1]': 'condition',
                         'events[0]': 'session_1_arm_1'}
         return self._make_request(request_data, 'Session 1 data')

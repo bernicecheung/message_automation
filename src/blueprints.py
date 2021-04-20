@@ -25,19 +25,31 @@ def _validate_participant_id(form_data: ImmutableMultiDict) -> Optional[List[str
         return None
 
 
-def _validate_form(form_data: ImmutableMultiDict) -> Optional[List[str]]:
-    errors = []
+@bp.route('/diary', methods=['GET', 'POST'])
+def diary_form():
+    if request.method == 'GET':
+        return render_template('daily_diary_form.html')
+    elif request.method == 'POST':
+        if 'submit' in request.form:
+            # Access form properties and do stuff
+            error = _validate_participant_id(request.form)
+            if error:
+                for e in error:
+                    flash(e, 'danger')
+                return render_template('daily_diary_form.html')
 
-    temp = _validate_participant_id(form_data)
-    if temp is not None:
-        errors += temp
-    if len(form_data['start_date']) == 0:
-        errors.append('Start date cannot be empty')
+            rc = Redcap(api_token=current_app.config['AUTOMATIONCONFIG']['redcap_api_token'])
+            try:
+                part = rc.get_session_0(request.form['participant'])
+            except RedcapError as err:
+                flash(str(err), 'danger')
+                return render_template('daily_diary_form.html')
 
-    if errors:
-        return errors
-    else:
-        return None
+            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part,
+                                instance_path=current_app.instance_path)
+            if not eg.daily_diary():
+                flash('Failed to create daily diary round 1', 'danger')
+            return render_template('daily_diary_form.html')
 
 
 @bp.route('/', methods=['GET', 'POST'])
@@ -47,7 +59,7 @@ def generation_form():
     elif request.method == 'POST':
         if 'submit' in request.form:
             # Access form properties and do stuff
-            error = _validate_form(request.form)
+            error = _validate_participant_id(request.form)
             if error:
                 for e in error:
                     flash(e, 'danger')
@@ -62,7 +74,7 @@ def generation_form():
 
             eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part,
                                 instance_path=current_app.instance_path)
-            if eg.generate(request.form['start_date']):
+            if eg.generate():
                 f = eg.write_file()
                 return send_file(f, mimetype='text/csv', as_attachment=True)
             else:

@@ -3,6 +3,7 @@ import csv
 import logging
 import random
 import zipfile
+from collections import namedtuple
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List
@@ -94,6 +95,17 @@ def _create_archive(participant_id: str) -> str:
     return str(archive_name)
 
 
+def _condition_abbrev(condition: Condition) -> str:
+    if condition == Condition.VALUES:
+        return 'Values'
+    elif condition == Condition.HIGHLEVEL:
+        return 'HLC'
+    elif condition == Condition.DOWNREG:
+        return 'CR'
+    else:
+        assert 'Invalid condition'
+
+
 class EventGenerator:
     def __init__(self, config: Dict[str, str], participant: Participant, instance_path: str):
         """
@@ -108,7 +120,63 @@ class EventGenerator:
         self._path = Path(instance_path) / config['message_file']
         self._messages = None
 
-    def generate(self, start_date: str) -> bool:
+    def daily_diary(self):
+        """
+        Generate events for the first round of daily diary messages.
+
+        Generate events for the first round of daily diary messages,
+        which are sent after session 0, before session 1.
+        :return:
+        """
+        apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
+                          user=self._config['apptoto_user'])
+        part = ApptotoParticipant(name=self._participant.initials, phone=self._participant.phone_number)
+
+        first_day = self._participant.daily_diary_time()
+
+        events = []
+        for day in range(0, 4):
+            content = f'UO: Daily Diary #{day + 1}'
+            title = f'ASH Daily Diary #{day + 1}'
+            t = first_day + timedelta(days=day)
+            events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                       title=title,
+                                       start_time=t,
+                                       end_time=t,
+                                       content=content,
+                                       participants=[copy.copy(part)]))
+
+        # Add quit_message_date date boosters
+        s = datetime.strptime(f'{self._participant.quit_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
+        quit_message_date = s + timedelta(hours=3)
+        content = 'UO: Quit Date'
+        title = 'UO: Quit Date'
+        events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                   title=title,
+                                   start_time=quit_message_date,
+                                   end_time=quit_message_date,
+                                   content=content,
+                                   participants=[copy.copy(part)]))
+
+        quit_message_date = quit_message_date - timedelta(days=1)
+        content = 'UO: Day Before'
+        title = 'UO: Day Before'
+        events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                   title=title,
+                                   start_time=quit_message_date,
+                                   end_time=quit_message_date,
+                                   content=content,
+                                   participants=[copy.copy(part)]))
+
+        if len(events) > 0:
+            return apptoto.post_events(events)
+
+    def generate(self) -> bool:
+        """
+        Generate events for intervention messages, messages about daily cigarette usage,
+        messages for boosters, daily diary rounds 2, 3 and 4.
+        :return:
+        """
         apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
                           user=self._config['apptoto_user'])
         part = ApptotoParticipant(name=self._participant.initials, phone=self._participant.phone_number)
@@ -120,10 +188,14 @@ class EventGenerator:
                                                             self._participant.message_values,
                                                             num_required_messages)
 
-        s = datetime.strptime(f'{start_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
-        e = datetime.strptime(f'{start_date} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
+        s = datetime.strptime(f'{self._participant.quit_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
+        e = datetime.strptime(f'{self._participant.quit_date} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
         hour_before_sleep_time = e - timedelta(seconds=3600)
+        three_hours_before_sleep_time = e - timedelta(hours=3)
 
+        Event = namedtuple('Event', ['time', 'title', 'content'])
+
+        # Generate intervention messages
         n = 0
         for days in range(DAYS_1):
             delta = timedelta(days=days)
@@ -135,12 +207,7 @@ class EventGenerator:
             for t in times_list:
                 # Prepend each message with "UO: "
                 content = "UO: " + self._messages[n].message
-                events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
-                                           title=SMS_TITLE,
-                                           start_time=t,
-                                           end_time=t,
-                                           content=content,
-                                           participants=[copy.copy(part)]))
+                events.append(Event(time=t, title=SMS_TITLE, content=content))
                 n = n + 1
 
         for days in range(DAYS_1, DAYS_1 + DAYS_2):
@@ -153,28 +220,58 @@ class EventGenerator:
             for t in times_list:
                 # Prepend each message with "UO: "
                 content = "UO: " + self._messages[n].message
-                events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
-                                           title=SMS_TITLE,
-                                           start_time=t,
-                                           end_time=t,
-                                           content=content,
-                                           participants=[copy.copy(part)]))
+                events.append(Event(time=t, title=SMS_TITLE, content=content))
                 n = n + 1
 
         # Add one message per day asking for a reply with the number of cigarettes smoked
         for days in range(DAYS_1 + DAYS_2):
             delta = timedelta(days=days)
             t = hour_before_sleep_time + delta
-            content = "UO: Reply back with the number of cigarettes smoked today"
-            events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
-                                       title=SMS_TITLE,
-                                       start_time=t,
-                                       end_time=t,
-                                       content=content,
-                                       participants=[copy.copy(part)]))
+            content = "UO: Good evening! Please respond with the number of cigarettes you have smoked today. " \
+                      "If you have not smoked any cigarettes, please respond with a 0. Thank you!"
+            events.append(Event(time=t, title=SMS_TITLE, content=content))
+
+        # Add booster messages
+        n = 1
+        for days in range(1, 51, 7):
+            delta = timedelta(days=days)
+            t = three_hours_before_sleep_time + delta
+            title = f'{_condition_abbrev(self._participant.condition)} Booster {n}'
+            content = "UO: Booster session"
+            events.append(Event(time=t, title=title, content=content))
+            n = n + 1
+
+            delta = timedelta(days=(days + 3))
+            t = three_hours_before_sleep_time + delta
+            title = f'{_condition_abbrev(self._participant.condition)} Booster {n}'
+            content = "UO: Booster session"
+            events.append(Event(time=t, title=title, content=content))
+            n = n + 1
+
+        # Add daily diary messages
+        first_day = self._participant.daily_diary_time()
+        for day in range(0, 4):
+            content = f'UO: Daily Diary #{day + 5}'
+            title = f'ASH Daily Diary #{day + 5}'
+            t = first_day + timedelta(days=day + 37)
+            events.append(Event(time=t, title=title, content=content))
+        for day in range(0, 4):
+            content = f'UO: Daily Diary #{day + 9}'
+            title = f'ASH Daily Diary #{day + 9}'
+            t = first_day + timedelta(days=day + 114)
+            events.append(Event(time=t, title=title, content=content))
 
         if len(events) > 0:
-            return apptoto.post_events(events)
+            apptoto_events = []
+            for e in events:
+                apptoto_events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                                   title=e.title,
+                                                   start_time=e.time,
+                                                   end_time=e.time,
+                                                   content=e.content,
+                                                   participants=[copy.copy(part)]))
+
+            return apptoto.post_events(apptoto_events)
 
     def write_file(self):
         f = Path.home() / (self._participant.participant_id + '.csv')

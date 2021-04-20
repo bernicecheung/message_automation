@@ -8,12 +8,23 @@ session0_data = {'ash_id': 'ASH999',
                  'value1_s0': '1',
                  'value2_s0': '2',
                  'value7_s0': '7',
-                 'initials': 'ABC'}
-session1_data = {'ash_id': 'ASH999',
+                 'initials': 'ABC',
+                 'date_s0': '04-19-2021',
+                 'quitdate': '05-19-2021',
                  'waketime': '07:00',
-                 'sleeptime': '21:00',
+                 'sleeptime': '21:00'}
+session1_data = {'ash_id': 'ASH999',
                  'condition': '3'}
-
+session0_data_invalid_date = {'ash_id': 'ASH999',
+                              'phone': '555-555-1234',
+                              'value1_s0': '1',
+                              'value2_s0': '2',
+                              'value7_s0': '7',
+                              'initials': 'ABC',
+                              'date_s0': '21-03-2021',
+                              'quitdate': '21-03-2021',
+                              'waketime': '07:00',
+                              'sleeptime': '21:00'}
 
 class TestRedcap:
     def test_get_participant_phone_invalid_id(self, requests_mock):
@@ -85,3 +96,24 @@ class TestRedcap:
 
         with pytest.raises(RedcapError):
             rc.get_participant_specific_data('Response from REDCap')
+
+    def test_get_session_0_invalid_id(self, requests_mock):
+        rc = Redcap(api_token='test token')
+        requests_mock.post(url=rc._endpoint,
+                           status_code=requests.codes.ok,
+                           json=[session0_data_invalid_date])
+
+        with pytest.raises(RedcapError) as e:
+            rc.get_session_0('Invalid ID')
+
+        assert 'Unable to find session 0' in str(e.value)
+
+    def test_get_session_0_valid(self, requests_mock):
+        rc = Redcap(api_token='test token')
+        requests_mock.post(url=rc._endpoint,
+                           status_code=requests.codes.ok,
+                           json=[session0_data])
+
+        participant = rc.get_session_0('ASH999')
+
+        assert participant.participant_id == 'ASH999'
