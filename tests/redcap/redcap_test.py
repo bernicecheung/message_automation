@@ -97,17 +97,6 @@ class TestRedcap:
         with pytest.raises(RedcapError):
             rc.get_participant_specific_data('Response from REDCap')
 
-    def test_get_session_0_invalid_date(self, requests_mock):
-        rc = Redcap(api_token='test token')
-        requests_mock.post(url=rc._endpoint,
-                           status_code=requests.codes.ok,
-                           json=[session0_data_invalid_date])
-
-        with pytest.raises(RedcapError) as e:
-            rc.get_session_0('ASH999')
-
-        assert 'Unable to convert date' in str(e.value)
-
     def test_get_session_0_invalid_id(self, requests_mock):
         rc = Redcap(api_token='test token')
         requests_mock.post(url=rc._endpoint,

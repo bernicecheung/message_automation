@@ -153,8 +153,8 @@ class Redcap:
         id_temp = None
         initials = None
         phone_number = None
-        session_0_date = None
-        quit_date = None
+        session_0_date_str = None
+        quit_date_str = None
         wake_time = None
         sleep_time = None
         message_values = []
@@ -174,12 +174,6 @@ class Redcap:
 
                 task_values.append(CodedValues(int(s0['value1_s0'])))
                 task_values.append(CodedValues(int(s0['value7_s0'])))
-                try:
-                    session_0_date = datetime.datetime.strptime(session_0_date_str, '%m-%d-%Y')
-                    quit_date = datetime.datetime.strptime(quit_date_str, '%m-%d-%Y')
-                except ValueError as e:
-                    raise RedcapError(f'Unable to convert date - {e}')
-                break
 
         if id_temp != participant_id:
             raise RedcapError(f'Unable to find session 0 in Redcap - participant ID - {participant_id}')
@@ -188,8 +182,8 @@ class Redcap:
         part.participant_id = participant_id
         part.initials = initials
         part.phone_number = phone_number
-        part.session0_date = session_0_date
-        part.quit_date = quit_date
+        part.session0_date = session_0_date_str
+        part.quit_date = quit_date_str
         part.wake_time = wake_time
         part.sleep_time = sleep_time
         part.message_values = message_values
