@@ -32,9 +32,9 @@ class Participant:
             # so the first daily diary is on Sunday.
             # If session 0 is on Sunday, adjust first_day 3 days after session 0,
             # so the last daily diary is on Saturday.
-            if self.session0_date.weekday() == 5:
+            if s.weekday() == 5:
                 first_day = s + timedelta(days=1) - timedelta(hours=2)
-            elif self.session0_date.weekday() == 6:
+            elif s.weekday() == 6:
                 first_day = s + timedelta(days=3) - timedelta(hours=2)
             else:
                 first_day = s + timedelta(days=2) - timedelta(hours=2)
