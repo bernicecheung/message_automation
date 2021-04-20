@@ -108,6 +108,70 @@ class EventGenerator:
         self._path = Path(instance_path) / config['message_file']
         self._messages = None
 
+    def daily_diary(self):
+        """
+        Generate events for the first round of daily diary messages.
+
+        Generate events for the first round of daily diary messages,
+        which are sent after session 0, before session 1.
+        :return:
+        """
+        apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
+                          user=self._config['apptoto_user'])
+        part = ApptotoParticipant(name=self._participant.initials, phone=self._participant.phone_number)
+
+        s = datetime.strptime(f'{self._participant.session0_date} {self._participant.sleep_time}', '%Y-%m-%d %H:%M')
+        # First day for daily diary messages is usually 2 days after session 0,
+        # 3 hours before normal sleep time.
+        # But at least one daily diary must be on the weekend,
+        # so if session 0 is on a Saturday, adjust first_day one day after session 0,
+        # so the first daily diary is on Sunday.
+        # If session 0 is on Sunday, adjust first_day 3 days after session 0,
+        # so the last daily diary is on Saturday.
+        if self._participant.session0_date.weekday() == 5:
+            first_day = s + timedelta(days=1) - timedelta(hours=3)
+        elif self._participant.session0_date.weekday() == 6:
+            first_day = s + timedelta(days=3) - timedelta(hours=3)
+        else:
+            first_day = s + timedelta(days=2) - timedelta(hours=3)
+
+        events = []
+        for day in range(0, 4):
+            content = f'UO: Daily Diary #{day + 1}'
+            title = f'ASH Daily Diary #{day + 1}'
+            t = first_day + timedelta(days=day)
+            events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                       title=title,
+                                       start_time=t,
+                                       end_time=t,
+                                       content=content,
+                                       participants=[copy.copy(part)]))
+
+        # Add quit_message_date date boosters
+        s = datetime.strptime(f'{self._participant.quit_date} {self._participant.wake_time}', '%Y-%m-%d %H:%M')
+        quit_message_date = s + timedelta(hours=3)
+        content = f'UO: Quit Date'
+        title = f'UO: Quit Date'
+        events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                   title=title,
+                                   start_time=quit_message_date,
+                                   end_time=quit_message_date,
+                                   content=content,
+                                   participants=[copy.copy(part)]))
+
+        quit_message_date = quit_message_date - timedelta(days=1)
+        content = f'UO: Day Before'
+        title = f'UO: Day Before'
+        events.append(ApptotoEvent(calendar=self._config['apptoto_calendar'],
+                                   title=title,
+                                   start_time=quit_message_date,
+                                   end_time=quit_message_date,
+                                   content=content,
+                                   participants=[copy.copy(part)]))
+
+        if len(events) > 0:
+            return apptoto.post_events(events)
+
     def generate(self, start_date: str) -> bool:
         apptoto = Apptoto(api_token=self._config['apptoto_api_token'],
                           user=self._config['apptoto_user'])

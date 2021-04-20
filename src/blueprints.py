@@ -40,6 +40,33 @@ def _validate_form(form_data: ImmutableMultiDict) -> Optional[List[str]]:
         return None
 
 
+@bp.route('/diary', methods=['GET', 'POST'])
+def diary_form():
+    if request.method == 'GET':
+        return render_template('daily_diary_form.html')
+    elif request.method == 'POST':
+        if 'submit' in request.form:
+            # Access form properties and do stuff
+            error = _validate_participant_id(request.form)
+            if error:
+                for e in error:
+                    flash(e, 'danger')
+                return render_template('daily_diary_form.html')
+
+            rc = Redcap(api_token=current_app.config['AUTOMATIONCONFIG']['redcap_api_token'])
+            try:
+                part = rc.get_session_0(request.form['participant'])
+            except RedcapError as err:
+                flash(str(err), 'danger')
+                return render_template('daily_diary_form.html')
+
+            eg = EventGenerator(config=current_app.config['AUTOMATIONCONFIG'], participant=part,
+                                instance_path=current_app.instance_path)
+            if not eg.daily_diary():
+                flash('Failed to create daily diary round 1', 'danger')
+            return render_template('daily_diary_form.html')
+
+
 @bp.route('/', methods=['GET', 'POST'])
 def generation_form():
     if request.method == 'GET':
