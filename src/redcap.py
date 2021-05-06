@@ -166,8 +166,8 @@ class Redcap:
                 phone_number = s0['phone']
                 session_0_date_str = s0['date_s0']
                 quit_date_str = s0['quitdate']
-                wake_time = s0['waketime']
-                sleep_time = s0['sleeptime']
+                wake_time = s0.get('waketime')
+                sleep_time = s0.get('sleeptime')
                 message_values.append(CodedValues(int(s0['value1_s0'])))
                 message_values.append(CodedValues(int(s0['value2_s0'])))
 
@@ -176,6 +176,12 @@ class Redcap:
 
         if id_temp != participant_id:
             raise RedcapError(f'Unable to find session 0 in Redcap - participant ID - {participant_id}')
+
+        if not wake_time or len(wake_time) == 0:
+            raise RedcapError(f'Unable to find wake time in session 0 in Redcap - participant ID - {participant_id}')
+
+        if not sleep_time or len(sleep_time) == 0:
+            raise RedcapError(f'Unable to find sleep time in session 0 in Redcap - participant ID - {participant_id}')
 
         part = Participant()
         part.participant_id = participant_id

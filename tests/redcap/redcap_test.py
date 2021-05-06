@@ -25,6 +25,27 @@ session0_data_invalid_date = {'ash_id': 'ASH999',
                               'quitdate': '21-03-2021',
                               'waketime': '07:00',
                               'sleeptime': '21:00'}
+session0_data_missing_wake = {'ash_id': 'ASH999',
+                              'phone': '555-555-1234',
+                              'value1_s0': '1',
+                              'value2_s0': '2',
+                              'value7_s0': '7',
+                              'initials': 'ABC',
+                              'date_s0': '21-03-2021',
+                              'quitdate': '21-03-2021',
+                              'waketime': '',
+                              'sleeptime': '21:00'}
+session0_data_missing_sleep = {'ash_id': 'ASH999',
+                               'phone': '555-555-1234',
+                               'value1_s0': '1',
+                               'value2_s0': '2',
+                               'value7_s0': '7',
+                               'initials': 'ABC',
+                               'date_s0': '21-03-2021',
+                               'quitdate': '21-03-2021',
+                               'waketime': '07:00',
+                               'sleeptime': ''}
+
 
 class TestRedcap:
     def test_get_participant_phone_invalid_id(self, requests_mock):
@@ -117,3 +138,25 @@ class TestRedcap:
         participant = rc.get_session_0('ASH999')
 
         assert participant.participant_id == 'ASH999'
+
+    def test_get_session_0_blank_waketime(self, requests_mock):
+        rc = Redcap(api_token='test token')
+        requests_mock.post(url=rc._endpoint,
+                           status_code=requests.codes.ok,
+                           json=[session0_data_missing_wake])
+
+        with pytest.raises(RedcapError) as e:
+            rc.get_session_0('ASH999')
+
+        assert 'wake time' in str(e.value)
+
+    def test_get_session_0_blank_sleeptime(self, requests_mock):
+        rc = Redcap(api_token='test token')
+        requests_mock.post(url=rc._endpoint,
+                           status_code=requests.codes.ok,
+                           json=[session0_data_missing_sleep])
+
+        with pytest.raises(RedcapError) as e:
+            rc.get_session_0('ASH999')
+
+        assert 'sleep time' in str(e.value)
