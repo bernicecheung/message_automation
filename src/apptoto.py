@@ -7,9 +7,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from src.apptoto_event import ApptotoEvent
-from src.constants import DAYS_1, DAYS_2, MESSAGES_PER_DAY_1, MESSAGES_PER_DAY_2
-
-RETHINK_SMOKING_CALENDAR_ID = 1000024493
+from src.constants import MAX_EVENTS, ASH_CALENDAR_ID
 
 
 class Apptoto:
@@ -55,10 +53,9 @@ class Apptoto:
 
     def get_events(self, begin: datetime, phone_number: str) -> List[int]:
         url = f'{self._endpoint}/events'
-        max_events = DAYS_1 * MESSAGES_PER_DAY_1 + DAYS_2 * MESSAGES_PER_DAY_2 + DAYS_1 + DAYS_2
         params = {'begin': begin.isoformat(),
                   'phone_number': phone_number,
-                  'page_size': max_events}
+                  'page_size': MAX_EVENTS}
         r = requests.get(url=url,
                          params=params,
                          headers=self._headers,
@@ -68,8 +65,7 @@ class Apptoto:
         event_ids = []
         if r.status_code == requests.codes.ok:
             events = r.json()['events']
-            for e in events:
-                event_ids.append(e['id'])
+            event_ids = [e['id'] for e in events if not e.get('is_deleted') and e.get('calendar_id') == ASH_CALENDAR_ID]
         else:
             print(f'Failed to get events - {str(r.status_code)} - {str(r.content)}')
 
@@ -105,7 +101,7 @@ class Apptoto:
             response = r.json()['events']
             for e in response:
                 # Check only events on the right calendar, where there is a conversation
-                if e['calendar_id'] == RETHINK_SMOKING_CALENDAR_ID and \
+                if e['calendar_id'] == ASH_CALENDAR_ID and \
                     e['participants'] and \
                         e['participants'][0]['conversations']:
                     for conversation in e['participants'][0]['conversations']:
