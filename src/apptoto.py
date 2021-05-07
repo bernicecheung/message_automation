@@ -7,7 +7,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from src.apptoto_event import ApptotoEvent
-from src.constants import MAX_EVENTS
+from src.constants import MAX_EVENTS, ASH_CALENDAR_ID
 
 RETHINK_SMOKING_CALENDAR_ID = 1000024493
 
@@ -67,8 +67,7 @@ class Apptoto:
         event_ids = []
         if r.status_code == requests.codes.ok:
             events = r.json()['events']
-            for e in events:
-                event_ids.append(e['id'])
+            event_ids = [e['id'] for e in events if not e.get('is_deleted') and e.get('calendar_id') == ASH_CALENDAR_ID]
         else:
             print(f'Failed to get events - {str(r.status_code)} - {str(r.content)}')
 
