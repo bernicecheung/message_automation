@@ -9,8 +9,6 @@ from requests.auth import HTTPBasicAuth
 from src.apptoto_event import ApptotoEvent
 from src.constants import MAX_EVENTS, ASH_CALENDAR_ID
 
-RETHINK_SMOKING_CALENDAR_ID = 1000024493
-
 
 class Apptoto:
     def __init__(self, api_token: str, user: str):
@@ -103,7 +101,7 @@ class Apptoto:
             response = r.json()['events']
             for e in response:
                 # Check only events on the right calendar, where there is a conversation
-                if e['calendar_id'] == RETHINK_SMOKING_CALENDAR_ID and \
+                if e['calendar_id'] == ASH_CALENDAR_ID and \
                     e['participants'] and \
                         e['participants'][0]['conversations']:
                     for conversation in e['participants'][0]['conversations']:
