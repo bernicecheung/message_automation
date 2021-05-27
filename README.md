@@ -49,7 +49,7 @@ Delete messages scheduled to be sent, for a given participant.
 
 Enter the participant ID, then press the "Delete messages" button.
 
-This endpoint deletes messsages from the current day, going forward, so
+This endpoint deletes messages from the current day, going forward, so
 participants who leave the study are not receiving unwanted texts.
 
 ### /count/\<participant_id\>
