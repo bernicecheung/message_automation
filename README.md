@@ -7,7 +7,7 @@ and deleting scheduled messages that are not needed any more.
 ### /
 Generate the text messages for a given participant.
 
-Enter the participant ID, and a start date, then press the "Generate messages"
+Enter the participant ID, then press the "Generate messages"
 button. If successful, CSV file with all the messages to be sent to this
 participant is available to download.
 
@@ -17,9 +17,10 @@ For example, ASH004 or ASH666 are valid participant IDs.
 Generating messages takes about 4 minutes because the site has to go to REDCap
 to get the participant information, such as the participant's most important
 values, their phone number, and the times it is appropriate to text.
-Then it has to use Apptoto to generate 252 text messages for the intervention
-and 56 messages asking for number of cigarettes smoked each day of the
-intervention.
+Then it has to use Apptoto to generate 252 text messages for the intervention,
+56 messages asking for number of cigarettes smoked each day of the
+intervention, and 12 messages for the daily diary sessions 2, 3, and 4.
+
 
 ### /task
 Gets the input files for the values affirmation task, for a given participant.
