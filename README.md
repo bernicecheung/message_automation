@@ -21,6 +21,18 @@ Then it has to use Apptoto to generate 252 text messages for the intervention,
 56 messages asking for number of cigarettes smoked each day of the
 intervention, and 12 messages for the daily diary sessions 2, 3, and 4.
 
+### /diary
+Generate the daily diary messages and quit date boosters for a given participant.
+
+Use this endpoint after Session 0, preferable the day after, but before Session 1.
+
+Enter the participant ID, then press the "Create daily diary"
+button. If successful, a success message is displayed.
+
+The participant ID must be in the form `ASHnnn` where n is a number.
+For example, ASH004 or ASH666 are valid participant IDs. 
+
+Generating these messages takes only a few seconds.
 
 ### /task
 Gets the input files for the values affirmation task, for a given participant.
