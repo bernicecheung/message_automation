@@ -24,21 +24,20 @@ az group create --name sanlab_rg_Linux_westus2 --location westus2
 az appservice plan create --name sanlab_asp_Linux_westus2 --sku F1 --is-linux --resource-group sanlab_rg_Linux_westus2
 ```
 
-## Deploying updates
-The following are steps to deploy an application, for the first time or to
-deploy updates to the application. 
-
+## Create the application for the first time
+The following are steps to deploy an application.
 
 Create an app on Azure App Services as:
 
 ```
 az webapp up --sku F1 --location "West US 2" --name message-automation --resource-group sanlab_rg_Linux_westus2 --plan sanlab_asp_Linux_westus2
 ```
-To deploy updates, issue the same command as used to create the app.
 
 Reference:
 [Quickstart: Create a Python app in Azure App Service on Linux](
 https://docs.microsoft.com/en-us/azure/app-service/containers/quickstart-python)
+
+### Configuration
 
 App is configured as:
 
@@ -59,4 +58,24 @@ Reference: [Configure a Linux Python app for Azure App Service](https://docs.mic
 #### Enable logging
 ```
 az webapp log config --resource-group sanlab_rg_Linux_westus2 --name message-automation --docker-container-logging filesystem
+```
+
+#### Use Python3.8
+```
+az webapp config set --resource-group sanlab_rg_Linux_westus2 --name message-automation --linux-fx-version "PYTHON|3.8"
+```
+
+#### Build automation
+Configure Azure App Service to install dependencies (via `pip`).
+```
+az webapp config appsettings set --resource-group sanlab_rg_Linux_westus2 --name message-automation --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
+```
+
+#### Deploy a ZIP file
+This application is deployed using ZIP file deployments so that configuration
+that is not stored in git or github can be added to the ZIP file and uploaded to Azure.
+
+Create a zip file from the `src/`, `tests/` and `instance/` directories, at minimum.
+```
+az webapp deployment source config-zip --resource-group sanlab_rg_Linux_westus2 --name message-automation --src message_automation.zip
 ```
