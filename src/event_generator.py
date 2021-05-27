@@ -17,6 +17,7 @@ from src.message import MessageLibrary
 from src.participant import Participant
 
 SMS_TITLE = 'ASH SMS'
+CIGS_TITLE = 'ASH CIGS'
 TASK_MESSAGES = 20
 ITI = [
     0.0,
@@ -229,7 +230,7 @@ class EventGenerator:
             t = hour_before_sleep_time + delta
             content = "UO: Good evening! Please respond with the number of cigarettes you have smoked today. " \
                       "If you have not smoked any cigarettes, please respond with a 0. Thank you!"
-            events.append(Event(time=t, title=SMS_TITLE, content=content))
+            events.append(Event(time=t, title=CIGS_TITLE, content=content))
 
         # Add booster messages
         n = 1
