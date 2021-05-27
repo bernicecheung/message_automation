@@ -1,0 +1,1 @@
+gunicorn --bind=0.0.0.0 --timeout 600 --env MESSAGE_AUTOMATION_SETTINGS=config.py "src.flask_app:create_app()"
