@@ -75,7 +75,9 @@ az webapp config appsettings set --resource-group sanlab_rg_Linux_westus2 --name
 This application is deployed using ZIP file deployments so that configuration
 that is not stored in git or github can be added to the ZIP file and uploaded to Azure.
 
-Create a zip file from the `src/`, `tests/` and `instance/` directories, at minimum.
+First, ls to the git repo directory, then
+
+create a zip file from the `src/`, `tests/` and `instance/` directories, at minimum.
 ```
 az webapp deployment source config-zip --resource-group sanlab_rg_Linux_westus2 --name message-automation --src message_automation.zip
 ```
